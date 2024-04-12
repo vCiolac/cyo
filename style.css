@@ -1,0 +1,220 @@
+body,
+#container {
+  background: #222;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.rpgui-content h1 {
+  font-size: 1.1em
+}
+
+section .rpgui-container {
+  position: relative;
+}
+
+#contain {
+  position: relative;
+}
+
+#flow {
+  overflow-y: scroll;
+}
+
+header {
+  padding: 25px;
+}
+
+.pageLeft {
+  width: 49%;
+  height: 300px;
+  display: inline-block;
+  overflow: auto;
+}
+
+.pageRight {
+  width: 49%;
+  height: 300px;
+  display: inline-block;
+  overflow: auto;
+}
+
+.rpgui-content ::-webkit-scrollbar-thumb,
+.rpgui-content::-webkit-scrollbar-thumb {
+  background-size: 100% 5%;
+}
+
+.btnAct {
+  align-items: center;
+  box-sizing: content-box;
+  margin: 5px;
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0.4em;
+  border: 1px solid;
+  color: rgba(0, 0, 0, 1);
+  text-align: center;
+  text-overflow: ellipsis;
+  background: #ffffff;
+  box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.8);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.btnAct:active {
+  margin: 3px 0 0 3px;
+  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.btnAct:hover {
+  background: rgba(226, 79, 79, 0.432);
+}
+
+.btnReset {
+  background-size: 82% 60%;
+  font-size: 0.85em;
+}
+
+#playPauseBtn {
+  background-size: 21% 46%;
+  font-size: 1rem;
+}
+
+.playPause {
+  height: 60px;
+  position: absolute;
+  top: -1.54em;
+  right: -4.33em;
+}
+
+#actionControls,
+#pageControls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#name {
+  max-width: 50vw;
+}
+
+#bars {
+  display: flex;
+  flex-shrink: 1;
+  align-items: center;
+  gap: 1em;
+}
+
+#playerName,
+#stateSelect {
+  max-width: 33%;
+}
+
+#infos {
+  display: flex;
+  margin: 0.2em;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.slots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 48%;
+  margin: 0.2em;
+}
+
+#imgs {
+  display: flex;
+  justify-content: space-evenly;
+  margin-bottom: 1em;
+}
+
+#imgs img {
+  max-width: 40vw;
+  max-height: 23vw;
+  object-fit: contain;
+  padding: 0%;
+}
+
+.zoom-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.zoom-img {
+  max-width: 70vw;
+  max-height: 80vw;
+  object-fit: contain;
+}
+
+.close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  font-size: 3rem;
+  cursor: pointer;
+  outline: none;
+  padding: 0.5rem;
+}
+
+
+@media screen and (max-width: 800px) {
+
+  .pageRight,
+  .pageLeft {
+    width: 100%;
+  }
+
+  #bars {
+    flex-direction: column;
+  }
+
+  #actionControls {
+    flex-direction: column;
+  }
+
+  #name {
+    max-width: 100%;
+  }
+
+  #imgs img {
+    max-width: 49%;
+    height: auto;
+  }
+
+  #playerName,
+  #stateSelect {
+    max-width: 96%;
+    align-self: stretch;
+  }
+
+  .playPause {
+    top: -4.21em;
+    right: -4.1em;
+  }
+
+  #infos {
+    flex-direction: column;
+  }
+
+  .slots {
+    justify-content: center;
+  }
+
+  .zoom-img {
+    max-width: 94vw;
+    max-height: 110vw;
+  }
+}

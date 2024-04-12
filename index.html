@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="dist/rpgui.min.css" rel="stylesheet" type="text/css">
+  <!-- <script src="dist/rpgui.min.js"></script> -->
+  <link rel="stylesheet" href="style.css">
+  <title>Choose Your Own</title>
+</head>
+
+<body>
+  <main id="flow" class="rpgui-content rpgui-cursor-default">
+    <div class="rpgui-cursor-default">
+      <section id="contain" class="rpgui-container framed">
+        <header>
+          <h2>CHOOSE-YOUR-OWN</h2>
+          <hr class="golden">
+          <h1>Faça suas escolhas e trace seu caminho neste jogo de aventura por texto.</h1>
+        </header>
+        <div id="book-container" class="rpgui-container framed-grey">
+        <div class="playPause">
+        <button class="rpgui-button" id="playPauseBtn">&#x25B6;</button>
+        </div>
+          <div id="imgs" class="rpgui-container">
+          </div>
+          <section class="pageLeft rpgui-container framed-golden">
+            <span id="textLeft"></span>
+          </section>
+          <section class="pageRight rpgui-container framed-golden">
+            <span id="textRight"></span>
+          </section>
+        </div>
+
+        <div id="space2"></div>
+        <section id="actionControls">
+          <button class="btnAct rpgui-button">Option 1</button>
+          <button class="btnAct rpgui-button">Option 2</button>
+        </section>
+        <section id="pageControls">
+          <a href="#book-container">
+            <button class="btnReset rpgui-button">Reiniciar</button>
+          </a>
+          <!-- <a href="#book-container">
+          <button class="btnBackPage rpgui-button">Voltar</button>
+          </a> -->
+        </section>
+        <hr>
+        <div id="bars">
+          <label>Vida:</label>
+          <div id="hp-bar" class="rpgui-progress red" data-rpguitype="progress"><div class=" rpgui-progress-track"><div class=" rpgui-progress-fill red" style="left: 0px; width: 100%;"></div></div><div class=" rpgui-progress-left-edge"></div><div class=" rpgui-progress-right-edge"></div></div>
+
+          <label>Mana:</label>
+          <div id="mp-bar" class="rpgui-progress blue" data-rpguitype="progress"><div class=" rpgui-progress-track"><div class=" rpgui-progress-fill blue" style="left: 0px; width: 100%;"></div></div><div class=" rpgui-progress-left-edge"></div><div class=" rpgui-progress-right-edge"></div></div>
+
+          <label>Experiência:</label>
+          <div id="xp-bar" class="rpgui-progress" data-rpguitype="progress"><div class=" rpgui-progress-track"><div class=" rpgui-progress-fill" style="left: 0px; width: 0%;"></div></div><div class=" rpgui-progress-left-edge"></div><div class=" rpgui-progress-right-edge"></div></div>
+          <div class="counter">
+            <label for="level">Level:</label>
+            <span id="level">1</span>
+          </div>
+        </div>
+        <h4>Informações/Inventário</h4>
+        <div id="infos">
+          <ul name="" class="rpgui-list-imp" id="stateSelect"></ul>
+          <div class="slots">
+          <div class="rpgui-icon weapon-slot"></div>
+				  <div class="rpgui-icon shield-slot"></div>
+				  <div class="rpgui-icon armor-slot"></div>
+				  <div class="rpgui-icon helmet-slot"></div>
+				  <div class="rpgui-icon ring-slot"></div>
+			  	<div class="rpgui-icon potion-slot"></div>
+  				<div class="rpgui-icon magic-slot"></div>
+	  			<div class="rpgui-icon shoes-slot"></div>
+		  		<div class="rpgui-icon empty-slot"></div>
+        </div>
+        </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+
+</html>
