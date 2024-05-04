@@ -74,6 +74,11 @@ header {
   font-size: 0.85em;
 }
 
+.btnBack {
+  background-size: 82% 60%;
+  font-size: 0.85em;
+}
+
 #playPauseBtn {
   background-size: 21% 46%;
   font-size: 1rem;
@@ -167,6 +172,33 @@ header {
   cursor: pointer;
   outline: none;
   padding: 0.5rem;
+}
+
+.popup {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.popup p {
+  text-align: center;
+  margin-bottom: 10px;
+  max-width: 300px;
+  overflow-wrap: break-word;
+}
+
+.popup button {
+  align-self: center;
+  background-size: 82% 60%;
+  font-size: 0.85em;
+  width: 100px;
 }
 
 
