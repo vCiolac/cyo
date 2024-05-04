@@ -250,14 +250,20 @@ function showTextNode(textNodeIndex) {
   fillStateSelect();
 };
 
-function showOption(option) { // Verifica se tem o state requirido para o botão
+function showOption(option) {
   return option.requiredState == null || option.requiredState(state);
 }; // Se a opção não pedir nada /\     ou se a opção pedir algo /\, executa a função.
 
 function selectOption(option) {
-  const nextTextNodeId = option.nextText;
+  let nextTextNodeId;
+  if (option.rollTheDice) {
+    nextTextNodeId = rollDice(option.rollTheDice[0], option.rollTheDice[1], option.rollTheDice[2]);
+  } else {
+    nextTextNodeId = option.nextText;
+  }
   history.push(nextTextNodeId);
   historyState = Object.assign({}, state);
+  backButtonClicked = false;
   if (nextTextNodeId === 5.4 || nextTextNodeId === 13.15) {
     controlProgress("hp", 'down', 10);
     playAudio('./mp3/hit30.mp3.flac');
@@ -266,7 +272,7 @@ function selectOption(option) {
     controlProgress("xp", 'up', 10);
     playAudio('./mp3/up.wav');
   }
-  if (nextTextNodeId === 12 || nextTextNodeId === 4 ) {
+  if (nextTextNodeId === 12 || nextTextNodeId === 4) {
     playAudio('./mp3/medieval_loop.wav');
   }
   if (nextTextNodeId <= 0) {
@@ -343,13 +349,14 @@ function addInputText(numID, names, placeholder) { // Id que será add / name&id
       button.innerText = option.text;
       button.classList.add('btnAct');
       button.addEventListener('click', () => {
-       if (isFinished.value) {
-        selectOption(option);
-      } else {
-        notification('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
-        writeSpeed = 0;
-        writeSpeed2 = 0;
-      }});
+        if (isFinished.value) {
+          selectOption(option);
+        } else {
+          notification('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
+          writeSpeed = 0;
+          writeSpeed2 = 0;
+        }
+      });
       optionActButtons.appendChild(button);
     }
   })
@@ -414,10 +421,16 @@ function fillStateSelect() {
   }
 };
 
+let backButtonClicked = false;
 const backButton = document.getElementsByClassName('btnBack')[0];
 backButton.addEventListener('click', () => {
   if (isFinished.value) {
-    returnBackwards();
+    if (!backButtonClicked) {
+      returnBackwards();
+      backButtonClicked = true;
+    } else {
+      notification('Você já voltou uma vez, não pode voltar mais.');
+    }
   } else {
     notification('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
     writeSpeed = 0;
@@ -440,22 +453,36 @@ function notification(mensagem) {
   const popUp = document.createElement('div');
   popUp.classList.add('popup');
   popUp.classList.add('rpgui-container', 'framed-golden');
-  
+
   const text = document.createElement('p');
   text.textContent = mensagem;
-  
+
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Fechar';
   closeBtn.classList.add('rpgui-button');
-  
+
   closeBtn.addEventListener('click', () => {
     popUp.remove();
   });
-  
+
   popUp.appendChild(text);
   popUp.appendChild(closeBtn);
-  
+
   document.body.appendChild(popUp);
+};
+
+function rollDice(id1_2, id3_4, id5_6) {
+  const result = Math.floor(Math.random() * 6) + 1;
+  let nextTextId;
+  if (result <= 2) {
+    nextTextId = id1_2;
+  } else if (result <= 4) {
+    nextTextId = id3_4;
+  } else {
+    nextTextId = id5_6;
+  }
+
+  return nextTextId;
 };
 
 const textNodes = [
@@ -1008,9 +1035,9 @@ const textNodes = [
   },
   {
     id: 11, //geral
-    imgSrc1: "",
-    imgSrc2: "",
-    textLeft: '"Bom, agora que sabemos um pouco mais sobre você, vamos nos concentrar em nossa missão. Estamos indo para uma masmorra antiga em busca de um artefato místico, e precisamos nos preparar bem para enfrentar os perigos que nos esperam lá dentro". Ele toma um gole de sua bebida antes de continuar',
+    imgSrc1: "./imgs/dungeonCave.jpg",
+    imgSrc2: "./imgs/base.jpg",
+    textLeft: '"Bom, agora que sabemos um pouco mais sobre você, vamos nos concentrar em nossa missão. Estamos indo para uma masmorra antiga em busca de um artefato místico, e precisamos nos preparar bem para enfrentar os perigos que nos esperam lá dentro". Ele toma um gole de sua bebida antes de continuar...',
     textRight: 'Clargoth se levanta da mesa e indica para você segui-lo. "Vamos até a nossa base de operações, onde vamos nos preparar para a jornada que nos aguarda". Ele caminha em direção à porta da taverna. O grupo de aventureiros que estava sentado próximo ao bar também se levanta e começa a seguir Clargoth em direção à base de operações.',
     options: [
       {
@@ -1021,31 +1048,34 @@ const textNodes = [
   },
   {
     id: 13,
-    imgSrc1: "",
+    imgSrc1: "./imgs/map.jpg",
     imgSrc2: "",
-    textLeft: 'Ao chegarem na base, Clargoth puxa um mapa de sua mochila e mostra as diferentes rotas que levam à entrada da masmorra. "Aqui estão nossas opções: a trilha da montanha, a estrada da floresta e o caminho do deserto. Qual você prefere?"',
-    textRight: 'Enquanto você pensa na escolha, Clargoth aponta para algo no mapa. "Oh, veja só, há uma charada que precisamos resolver para passar por um ponto crítico na trilha da montanha. Acho que é uma forma de proteção mágica do artefato que estamos procurando. Você é bom em charadas?"',
+    textLeft: 'Ao chegarem, Clargoth puxa um mapa de sua mochila e mostra as diferentes rotas que levam à entrada da masmorra. "Aqui estão nossas opções: a trilha na floresta, ir pela margem do rio e o caminho do deserto. Qual você prefere?"',
+    textRight: 'Enquanto você pensa na escolha, Clargoth aponta para o mapa. "Veja só, esta é a montanha em que precisamos chegar. A masmorra está localizada no seu interior, e dizem que o artefato místico está guardado por uma Tarascona. Uma espécie de dragão com carapaça de tartaruga, com espinhos e uma cauda venenosa..."',
     options: [
       {
-        text: 'Trilha da montanha',
+        text: 'Trilha na floresta',
+        requiredState: (currentState) => !currentState.failForest,
         nextText: 13.1
       },
       {
-        text: 'Estrada da floresta//em construção',
+        text: 'Pelo rio',
+        requiredState: (currentState) => !currentState.failRiver,
         nextText: 13
       },
       {
-        text: 'Caminho do deserto//em construção',
+        text: 'Caminho do deserto',
+        requiredState: (currentState) => !currentState.failDesert,
         nextText: 13
       },
     ]
   },
   {
-    id: 13.1, //trilha da montanha
+    id: 13.1, //Trilha na floresta
     imgSrc1: "",
-    imgSrc2: "",
+    imgSrc2: "./imgs/door.jpg",
     textLeft: 'Conforme vocês seguem pela trilha, a paisagem se torna cada vez mais íngreme e acidentada. Em certo ponto, vocês se deparam com um grande portão de pedra que bloqueia o caminho. O portão parece antigo e reforçado, e não há nenhuma alavanca ou mecanismo visível para abri-lo.',
-    textRight: 'Clargoth coça a barba, pensativo. "Parece que este portão não é tão fácil de abrir quanto eu pensava", diz ele, olhando para o portão com desconfiança. "Talvez haja alguma pista que possamos encontrar para abri-lo."',
+    textRight: 'Clargoth coça a barba, pensativo. "Parece que tem uma aura mágica em torno desse portão que não nós deixa contorna-lo", diz ele, olhando para o portão com desconfiança. "Talvez haja alguma pista que possamos encontrar para abri-lo."',
     options: [
       {
         text: 'Avançar',
@@ -1058,11 +1088,38 @@ const textNodes = [
     imgSrc1: "",
     imgSrc2: "",
     textLeft: 'Você começa a examinar o portão mais de perto e nota que há algumas inscrições em uma língua estranha esculpidas na pedra. Clargoth observa por cima do seu ombro. "Não reconheço essa língua. Parece que precisamos decifrar isso antes de podermos passar."',
-    textRight: 'Ao examinar as inscrições com mais cuidado você nota que cada letra parece estar ligada a um símbolo ou figura. Depois de alguns minutos decifrando as inscrições, você finalmente percebe que a charada está em forma de enigma.',
+    textRight: 'Ao examinar as inscrições com mais cuidado você nota que cada letra parece estar ligada a um símbolo ou figura. "Isso parece ser um enigma, talvez se resolvermos o enigma, o portão se abra."',
     options: [
       {
-        text: 'Avançar',
-        nextText: 13.13
+        text: 'Rolar o dado',
+        rollTheDice: [13.11, 13.114, 13.114],
+      }
+    ]
+  },
+  {
+    id: 13.11,
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Você jogou o dado e tirou 2. Com esse resultado, você não consegue decifrar o enigma e o portão permanece fechado.',
+    textRight: 'Clargoth olha para você e diz: "Parece que não temos conhecimento mágico suficiente para resolver isto... Melhor voltarmos e tentar por outro caminho"',
+    options: [
+      {
+        text: 'Voltar',
+        nextText: 13,
+        setState: { failForest: true },
+      },
+    ]
+  },
+  {
+    id: 13.114,
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Você jogou o dado e tirou 5. Com esse resultado, você consegue decifrar o primeiro enigma e palavras começam a surgir flutuando em frente ao portão.',
+    textRight: 'Clargoth olha para você e diz: "Parece que você é mais habilidoso do que eu pensava. Continue tentando, vamos ver o que acontece."',
+    options: [
+      {
+        text: 'Continuar',
+        nextText: 13.13,
       },
     ]
   },
@@ -1070,7 +1127,7 @@ const textNodes = [
     id: 13.13,
     imgSrc1: "",
     imgSrc2: "",
-    textLeft: `<h4>Eu sou uma criatura mágica que habita na masmorra, sou capaz de voar e tenho um corpo brilhante que reflete a luz.</h4>`,
+    textLeft: `<h4>Eu sou uma criatura mágica que habita na masmorra, sou capaz de voar e tenho um corpo brilhante translúcido.</h4>`,
     textRight: `<h4>Alguns me veem como uma bênção, outros como uma maldição.</h4>
    "O que sou eu?"`,
     options: [
@@ -1098,7 +1155,7 @@ const textNodes = [
   Os portões somem restando apenas as grandes paredes de pedra. "Não temos escolha, temos que ir por outro caminho agora." Diz Clargoth.`,
     options: [
       {
-        text: 'Estrada da floresta',
+        text: 'Pelo rio',
         nextText: 13.2
       },
       {
@@ -1112,13 +1169,13 @@ const textNodes = [
     imgSrc1: "",
     imgSrc2: "",
     textLeft: `<h4>Fantasma! você diz.</h4>
-    O portão mágico treme e começa a se mover, revelando uma passagem. Com isso, vocês conseguem passar pela porta mágica e continuar pela trilha da montanha. No caminho, vocês encontram uma ponte suspensa sobre um grande abismo. A ponte parece bastante instável e pode desabar a qualquer momento.`,
+    O portão mágico treme e começa a se mover, revelando uma passagem. Com isso, vocês conseguem passar pela porta mágica e continuar pela trilha. No caminho, vocês encontram uma ponte suspensa sobre um grande abismo. A ponte parece bastante instável e pode desabar a qualquer momento.`,
     textRight: `Clargoth se aproxima de você, e diz: "Precisamos passar pela ponte, mas ela me parece perigosa. Tenho uma ideia, vamos atravessar juntos, segurando um ao outro para garantir que ninguém caia. O que acha?"`,
     options: [
       {
         text: 'Boa ideia!',
         nextText: 13.16
-      },{
+      }, {
         text: 'Acho melhor um por vez',
         nextText: 13.16
       }
@@ -1131,17 +1188,34 @@ const textNodes = [
     textLeft: 'Você concorda com a ideia e todos começam a atravessar a ponte. Durante o caminho a ponte começa a balançar violentamente, Clargoth, que está no meio, começa a cantar uma música de guerra dos orcs para manter a concentração e a coragem do bando.',
     textRight: `<h4>Role um dado de seis lados para determinar se você consegue atravessar a ponte com segurança ou não.</h4>
     Agora é hora de testar a sua sorte.`,
-    // Você jogou o dado e tirou 6. Com esse resultado, você consegue atravessar a ponte sem problemas e chegar ao outro lado em segurança.
-
-// Caso você tivesse tirado 4 ou 5, você teria enfrentado algumas dificuldades durante a travessia e acabaria sofrendo alguns arranhões e cortes leves, mas conseguiria chegar ao outro lado.
-
-// No entanto, se tivesse tirado 1, 2 ou 3, você teria perdido o equilíbrio durante a travessia e acabaria caindo no abismo. Você sofreria um dano significativo e precisaria encontrar uma forma de se recuperar antes de continuar a missão.
     options: [
       {
-        text: 'Jogar',
-        nextText: 13.16
+        text: 'Jogar o dado',
+        rollTheDice: [13.163, 13.162, 13.161],
+
       }
     ]
+  },
+  {
+    id: 13.161,
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Você jogou o dado e tirou 6. Com esse resultado, você consegue atravessar a ponte sem problemas e chegar ao outro lado em segurança.',
+    textRight: 'Parabéns pela travessia bem-sucedida!'
+  },
+  {
+    id: 13.162,
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Você jogou o dado e tirou 4. Apesar de enfrentar algumas dificuldades durante a travessia e acabar sofrendo alguns arranhões e cortes leves, você consegue chegar ao outro lado.',
+    textRight: 'Apesar dos contratempos, você chegou ao seu destino.'
+  },
+  {
+    id: 13.163,
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Você jogou o dado e tirou 1. Infelizmente, você perdeu o equilíbrio durante a travessia e caiu no abismo. Sofrendo um dano significativo, você precisa encontrar uma forma de se recuperar antes de continuar a missão.',
+    textRight: 'Que azar! Mas não desista, ainda há muito a ser feito.'
   },
   {
     id: 12,
@@ -1151,19 +1225,12 @@ const textNodes = [
     textRight: 'Você acabou bebendo mais do que aguentava. A última coisa de que se lembra é de ter acabado de tomar um grande gole de hidromel e depois tudo ficou escuro.',
     options: [
       {
-        text: 'Reiniciar',
-        nextText: -1
-      },
-      {
         text: 'Este caminho ainda está em construção',
         requiredState: (currentState) => currentState.skipClargoth,
         nextText: -1,
-
       }
     ]
   }
 ];
 
 loadGameState()
-
-// module.exports = {typeWriter, addInputText, restart, tradePageContent, playAudio, playBackgroundMusic, playPauseButton, selectOption, showOption, showTextNode, startGame, dieOrUp, fillStateSelect, loadGameState, controlProgress, createImage};
