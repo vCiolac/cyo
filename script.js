@@ -12,7 +12,8 @@ let xpfirstChild = xp.firstChild;
 let hpFirstGrandChild = hpfirstChild.firstChild;
 let mpFirstGrandChild = mpfirstChild.firstChild;
 let xpFirstGrandChild = xpfirstChild.firstChild;
-
+let history = [];
+let historyState = {};
 let state = {};
 
 function startGame(num) {
@@ -46,6 +47,7 @@ function loadGameState() {
 
 function restart() {
   localStorage.clear();
+  history = [];
   startGame(1);
 };
 
@@ -53,7 +55,7 @@ resetBtn.addEventListener('click', () => {
   if (isFinished.value) {
     restart();
   } else {
-    alert('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
+    notification('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
     writeSpeed = 0;
     writeSpeed2 = 0;
   }
@@ -131,20 +133,15 @@ function typeWriter(newText, textElement, newText2, textElement2) {
   textElement.innerHTML = '';
   textElement2.innerHTML = '';
 
-  // Verificar se o novo texto contém um elemento <h4>
   const h4Index = newText.indexOf('<h4>');
   if (h4Index !== -1) {
-    // Encontrar a posição do próximo </h4>
     const closeH4Index = newText.indexOf('</h4>', h4Index) + 5;
-    // Definir o conteúdo do elemento textElement até o próximo </h4>
     textElement.innerHTML = newText.substring(0, closeH4Index);
     i = closeH4Index;
   }
   const h4Index2 = newText2.indexOf('<h4>');
   if (h4Index2 !== -1) {
-    // Encontrar a posição do próximo </h4>
     const closeH4Index2 = newText2.indexOf('</h4>', h4Index2) + 5;
-    // Definir o conteúdo do elemento textElement até o próximo </h4>
     textElement2.innerHTML = newText2.substring(0, closeH4Index2);
     i2 = closeH4Index2;
   }
@@ -233,7 +230,7 @@ function showTextNode(textNodeIndex) {
         if (isFinished.value) {
           selectOption(option);
         } else {
-          alert('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
+          notification('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
           writeSpeed = 0;
           writeSpeed2 = 0;
         }
@@ -259,6 +256,8 @@ function showOption(option) { // Verifica se tem o state requirido para o botão
 
 function selectOption(option) {
   const nextTextNodeId = option.nextText;
+  history.push(nextTextNodeId);
+  historyState = Object.assign({}, state);
   if (nextTextNodeId === 5.4 || nextTextNodeId === 13.15) {
     controlProgress("hp", 'down', 10);
     playAudio('./mp3/hit30.mp3.flac');
@@ -306,7 +305,7 @@ function dieOrUp(name) {
   let level = document.getElementById('level');
   if (name === 'hp' && parseInt(firstGrandChild.style.width) <= 0) {
     restart();
-    alert('Sua barra de vida chegou a 0%, você morreu.');
+    notification('Sua barra de vida chegou a 0%, você morreu.');
   } if (name === 'hp') {
 
   }
@@ -315,7 +314,7 @@ function dieOrUp(name) {
     let currentlvl = parseInt(level.innerHTML);
     let newLvl = currentlvl + 1;
     level.innerHTML = newLvl;
-    alert('Sua barra de experiência chegou a 100%! Você upou 1 level!');
+    notification('Sua barra de experiência chegou a 100%! Você upou 1 level!');
     firstGrandChild.style.width = 0;
   }
 
@@ -347,7 +346,7 @@ function addInputText(numID, names, placeholder) { // Id que será add / name&id
        if (isFinished.value) {
         selectOption(option);
       } else {
-        alert('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
+        notification('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
         writeSpeed = 0;
         writeSpeed2 = 0;
       }});
@@ -415,6 +414,50 @@ function fillStateSelect() {
   }
 };
 
+const backButton = document.getElementsByClassName('btnBack')[0];
+backButton.addEventListener('click', () => {
+  if (isFinished.value) {
+    returnBackwards();
+  } else {
+    notification('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
+    writeSpeed = 0;
+    writeSpeed2 = 0;
+  }
+});
+
+function returnBackwards() {
+  if (history.length > 1) {
+    history.pop();
+    const lastPage = history[history.length - 1];
+    state = Object.assign({}, historyState);
+    showTextNode(lastPage);
+  } else {
+    notification('Você não pode voltar ainda.');
+  }
+};
+
+function notification(mensagem) {
+  const popUp = document.createElement('div');
+  popUp.classList.add('popup');
+  popUp.classList.add('rpgui-container', 'framed-golden');
+  
+  const text = document.createElement('p');
+  text.textContent = mensagem;
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Fechar';
+  closeBtn.classList.add('rpgui-button');
+  
+  closeBtn.addEventListener('click', () => {
+    popUp.remove();
+  });
+  
+  popUp.appendChild(text);
+  popUp.appendChild(closeBtn);
+  
+  document.body.appendChild(popUp);
+};
+
 const textNodes = [
   {
     id: 1,
@@ -440,7 +483,7 @@ const textNodes = [
     imgSrc2: "./imgs/clargoth.png",
     textLeft: `Ao se aproximar do balcão, você pede uma bebida ao bartender, ele então enche uma caneca com hidromel e a desliza suavemente na sua direção. O aroma adocicado da bebida envolve o seu nariz enquanto você se refresca com um belo gole. O barulho alto das conversas e risadas se misturam com a musica de fundo.`,
     textRight: `Quando um guerreiro de aparência imponente ergue sua taça e chama a atenção dos outros membros. Com um sorriso malicioso no rosto, Clargoth, o líder orc do grupo, diz: 
-    "Companheiros, devemos nos preparar para a jornada! Mas antes.. Vamos aproveitar a noite e beber em honra do sucesso futuro!"`,
+    "Companheiros, devemos nos preparar para a jornada! Mas antes.. Vamos aproveitar a noite e beber em honra do nosso sucesso futuro!"`,
     options: [
       {
         text: 'Oferecer um brinde aos exploradores',
@@ -464,8 +507,8 @@ const textNodes = [
     imgSrc1: "",
     imgSrc2: "./imgs/clargHappy.png",
     textLeft: `Ao oferecer uma bebida para Clargoth e seu grupo, ele ergue a sobrancelha em surpresa, mas logo aceita com um sorriso largo no rosto, e diz:
-    "Muito obrigado, meu amigo. Iremos comemorar a futura vitória juntos!", levantando a caneca de hidromel em um brinde.`,
-    textRight: '"Vejo que você gosta de aventuras, hmmm... Deseja se juntar à nossa caçada?" Exclama Clargoth.',
+    "Muito obrigado, meu amigo. Iremos comemorar a vitória juntos!", levantando a caneca de hidromel em um brinde.`,
+    textRight: '"Com este seu gesto imagino que você goste de aventuras, hmmm... Deseja se juntar à nossa caçada?" Exclama Clargoth.',
     options: [
       {
         text: 'Sim! Estou sedento por ação',
@@ -627,7 +670,7 @@ const textNodes = [
     imgSrc1: "",
     imgSrc2: "./imgs/clargHappy.png",
     textLeft: `"Muito bem, meu amigo! Você provou ser habilidoso, e estou feliz em ter você em nosso grupo. Mas não se engane, o caminho que temos pela frente é cheio de perigos, monstros que desafiam a lógica e a própria natureza habitam a masmorra em que estamos prestes a entrar."`,
-    textRight: `"Nossas habilidades e forças serão testadas além do que podemos suportar, e muitos dos que começam essa jornada não voltam" Clargoth para por um segundo, com um olhar vibrante ele diz: "Saiba que a morte é um destino certo e horrível que aguarda aqueles que são fracos e imprudentes."`,
+    textRight: `"Nossas habilidades e forças serão testadas além do que podemos suportar, e muitos dos que começam essa jornada não voltam". Clargoth para por um segundo, e com um olhar vibrante ele diz: "Saiba que a morte é um destino certo e horrível que aguarda aqueles que são fracos e imprudentes."`,
     options: [
       {
         text: 'Eu entendo os perigos que nos aguardam e estou aqui para enfrentá-los',
