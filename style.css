@@ -188,10 +188,14 @@ header {
 }
 
 .popup p {
-  text-align: center;
+  color: white;
+  font-size: 1.0em;
+  line-height: 22px;
   margin-bottom: 10px;
   max-width: 300px;
   overflow-wrap: break-word;
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
 }
 
 .popup button {
@@ -201,6 +205,12 @@ header {
   width: 100px;
 }
 
+.footer {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
 
 @media screen and (max-width: 800px) {
 
@@ -214,7 +224,8 @@ header {
   }
 
   #actionControls {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
   }
 
   #name {
@@ -248,5 +259,9 @@ header {
   .zoom-img {
     max-width: 94vw;
     max-height: 110vw;
+  }
+
+  .footer {
+    margin-top: 2rem;
   }
 }
