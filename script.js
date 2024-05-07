@@ -25,20 +25,14 @@ function startGame(num) {
 };
 
 function loadGameState() {
-  const savedState = localStorage.getItem('gameState');
+  const savedState = JSON.parse(localStorage.getItem('gameState'));
   const savedPages = localStorage.getItem('gamePage');
-  const savedHp = localStorage.getItem('hp');
-  const savedMp = localStorage.getItem('mp');
-  const savedXp = localStorage.getItem('xp');
-  const savedLevel = localStorage.getItem('level');
-  if (savedHp !== null || savedMp !== null || savedXp !== null) {
-    hpFirstGrandChild.style.width = JSON.parse(savedHp);
-    mpFirstGrandChild.style.width = JSON.parse(savedMp);
-    xpFirstGrandChild.style.width = JSON.parse(savedXp);
-  }
-  if (savedState !== null || savedPages !== null || savedLevel !== null) {
-    state = JSON.parse(savedState);
-    level.innerHTML = JSON.parse(savedLevel)
+  hpFirstGrandChild.style.width = `${savedState.hp}%` ?? 100 + '%';
+  mpFirstGrandChild.style.width = `${savedState.mp}%`?? 100 + '%';
+  xpFirstGrandChild.style.width = `${savedState.xp}%` ?? 0 + '%';
+  if (savedState !== null || savedPages !== null ) {
+    state = savedState;
+    level.innerHTML = savedState.level ?? 1;
     showTextNode(JSON.parse(savedPages));
   } else {
     startGame(1);
@@ -85,7 +79,7 @@ function playPauseButton() {
 
 function playBackgroundMusic() {
   if (isBackgroundMusicPlaying) {
-    backgroundMusic.volume = 1; // 100%
+    backgroundMusic.volume = 0.9; // 1 = 100%
     backgroundMusic.play();
     isBackgroundMusicPlaying = true;
     backgroundMusic.addEventListener('ended', function () {
@@ -184,8 +178,13 @@ function typeWriter(newText, textElement, newText2, textElement2) {
   write();
 };
 
+function saveGameState(textNodeIndex) {
+  localStorage.setItem('gameState', JSON.stringify(state));
+  localStorage.setItem('gamePage', JSON.stringify(textNodeIndex));
+};
+
 function showTextNode(textNodeIndex) {
-  const textNode = textNodes.find(textNode => textNode.id === textNodeIndex); // Passa por todos os arrays de textnodes, procura o 'id' e faz textNode.id ser igual ao numero atribuido na selectOption.
+  const textNode = textNodes.find(textNode => textNode.id === textNodeIndex);
   isFinished.value = false;
   typeWriter(`${textNode.textLeft}`, textLeftElement, `${textNode.textRight}`, textRightElement);
   const imgs = document.getElementById('imgs')
@@ -237,16 +236,7 @@ function showTextNode(textNodeIndex) {
       });
     };
   });
-
-  function saveGameState() {
-    localStorage.setItem('gameState', JSON.stringify(state));
-    localStorage.setItem('gamePage', JSON.stringify(textNodeIndex));
-    localStorage.setItem('hp', JSON.stringify(hpFirstGrandChild.style.width));
-    localStorage.setItem('mp', JSON.stringify(mpFirstGrandChild.style.width));
-    localStorage.setItem('xp', JSON.stringify(xpFirstGrandChild.style.width));
-    localStorage.setItem('level', JSON.stringify(parseInt(level.innerHTML)));
-  }
-  saveGameState();
+  saveGameState(textNodeIndex, level);
   fillStateSelect();
 };
 
@@ -264,25 +254,35 @@ function selectOption(option) {
   history.push(nextTextNodeId);
   historyState = Object.assign({}, state);
   backButtonClicked = false;
-  if (nextTextNodeId === 5.4 || nextTextNodeId === 13.15) {
+  if (nextTextNodeId === 5.4 || nextTextNodeId === 13.15 || nextTextNodeId === 13.163) {
     controlProgress("hp", 'down', 10);
+    playAudio('./mp3/hit30.mp3.flac');
+  }
+  if (nextTextNodeId === 13.162) {
+    controlProgress("mp", 'down', 5);
     playAudio('./mp3/hit30.mp3.flac');
   }
   if (nextTextNodeId === 5.2 || nextTextNodeId === 5.3) {
     controlProgress("xp", 'up', 10);
     playAudio('./mp3/up.wav');
   }
+  if (nextTextNodeId === 13.14) {
+    playAudio('./mp3/up.wav');
+  }
+  if (nextTextNodeId === 13.15) {
+    playAudio('./mp3/hit30.mp3.flac');
+  }
   if (nextTextNodeId === 12 || nextTextNodeId === 4) {
     playAudio('./mp3/medieval_loop.wav');
   }
   if (nextTextNodeId <= 0) {
     return restart();
-  }
+  };
   state = Object.assign(state, option.setState); // Pega o state atual e adiciona tudo do setState clicado.
   showTextNode(nextTextNodeId);
 };
 
-function controlProgress(name, operador, hit) { // name = "hp" or "mp" or "xp" /oprd = up or down/ hit = valorporcentagem
+function controlProgress(name, operador, hit) { // name = "hp" or "mp" or "xp" // oprd = up or down // hit = valorporcentagem
   let progress = document.getElementById(name + "-bar");
   let firstChild = progress.firstChild;
   let firstGrandChild = firstChild.firstChild;
@@ -296,13 +296,12 @@ function controlProgress(name, operador, hit) { // name = "hp" or "mp" or "xp" /
     newWidth = currentWidth - hit;
   } else {
     return;
-  }
+  };
 
   firstGrandChild.style.width = newWidth + '%';
-  localStorage.setItem(name, JSON.stringify(newWidth + '%'));
   state[name] = newWidth;
   dieOrUp(name);
-}
+};
 
 function dieOrUp(name) {
   let progress = document.getElementById(name + "-bar");
@@ -310,11 +309,9 @@ function dieOrUp(name) {
   let firstGrandChild = firstChild.firstChild;
   let level = document.getElementById('level');
   if (name === 'hp' && parseInt(firstGrandChild.style.width) <= 0) {
-    restart();
     notification('Sua barra de vida chegou a 0%, você morreu.');
-  } if (name === 'hp') {
-
-  }
+    restart();
+  };
   if (name === 'xp' && parseInt(firstGrandChild.style.width) >= 100) {
     state.level += 1;
     let currentlvl = parseInt(level.innerHTML);
@@ -322,7 +319,7 @@ function dieOrUp(name) {
     level.innerHTML = newLvl;
     notification('Sua barra de experiência chegou a 100%! Você upou 1 level!');
     firstGrandChild.style.width = 0;
-  }
+  };
 
 };
 
@@ -375,17 +372,14 @@ function createImage(src) {
   img.classList.add('rpgui-container', 'framed');
 
   img.addEventListener('click', () => {
-    // cria a div para o zoom
     const zoomContainer = document.createElement('div');
     zoomContainer.classList.add('zoom-container');
 
-    // cria a imagem em tamanho maior
     const zoomImg = document.createElement('img');
     zoomImg.src = src;
     zoomImg.classList.add('zoom-img', 'rpgui-container', 'framed');
     zoomContainer.appendChild(zoomImg);
 
-    // cria o botão de fechar
     const closeButton = document.createElement('button');
     closeButton.classList.add('close-button');
     closeButton.innerHTML = '&times;';
@@ -394,7 +388,6 @@ function createImage(src) {
     });
     zoomContainer.appendChild(closeButton);
 
-    // adiciona o zoom ao corpo da página
     document.body.appendChild(zoomContainer);
   });
 
@@ -443,10 +436,16 @@ function returnBackwards() {
     history.pop();
     const lastPage = history[history.length - 1];
     state = Object.assign({}, historyState);
+    returnLocalStorageBackwards(lastPage)
     showTextNode(lastPage);
   } else {
     notification('Você não pode voltar ainda.');
   }
+};
+
+function returnLocalStorageBackwards(lastPage) {  
+  localStorage.setItem('gameState', JSON.stringify(state));
+  localStorage.setItem('gamePage', JSON.stringify(lastPage));
 };
 
 function notification(mensagem) {
@@ -472,6 +471,7 @@ function notification(mensagem) {
 };
 
 function rollDice(id1_2, id3_4, id5_6) {
+  playAudio('./mp3/dice.mp3');
   const result = Math.floor(Math.random() * 6) + 1;
   let nextTextId;
   if (result <= 2) {
@@ -567,6 +567,7 @@ const textNodes = [
       },
       {
         text: 'Nada não.',
+        setState: { skipClargoth: true },
         nextText: 12
       }
     ]
@@ -1035,7 +1036,7 @@ const textNodes = [
   },
   {
     id: 11, //geral
-    imgSrc1: "./imgs/dungeonCave.jpg",
+    imgSrc1: "",
     imgSrc2: "./imgs/base.jpg",
     textLeft: '"Bom, agora que sabemos um pouco mais sobre você, vamos nos concentrar em nossa missão. Estamos indo para uma masmorra antiga em busca de um artefato místico, e precisamos nos preparar bem para enfrentar os perigos que nos esperam lá dentro". Ele toma um gole de sua bebida antes de continuar...',
     textRight: 'Clargoth se levanta da mesa e indica para você segui-lo. "Vamos até a nossa base de operações, onde vamos nos preparar para a jornada que nos aguarda". Ele caminha em direção à porta da taverna. O grupo de aventureiros que estava sentado próximo ao bar também se levanta e começa a seguir Clargoth em direção à base de operações.',
@@ -1055,18 +1056,18 @@ const textNodes = [
     options: [
       {
         text: 'Trilha na floresta',
-        requiredState: (currentState) => !currentState.failForest,
+        requiredState: (currentState) => !currentState.skipForest,
         nextText: 13.1
       },
       {
         text: 'Pelo rio',
-        requiredState: (currentState) => !currentState.failRiver,
-        nextText: 13
+        requiredState: (currentState) => !currentState.skipRiver,
+        nextText: 13.2
       },
       {
         text: 'Caminho do deserto',
-        requiredState: (currentState) => !currentState.failDesert,
-        nextText: 13
+        requiredState: (currentState) => !currentState.skipDesert,
+        nextText: 13.3
       },
     ]
   },
@@ -1088,7 +1089,7 @@ const textNodes = [
     imgSrc1: "",
     imgSrc2: "",
     textLeft: 'Você começa a examinar o portão mais de perto e nota que há algumas inscrições em uma língua estranha esculpidas na pedra. Clargoth observa por cima do seu ombro. "Não reconheço essa língua. Parece que precisamos decifrar isso antes de podermos passar."',
-    textRight: 'Ao examinar as inscrições com mais cuidado você nota que cada letra parece estar ligada a um símbolo ou figura. "Isso parece ser um enigma, talvez se resolvermos o enigma, o portão se abra."',
+    textRight: 'Ao examinar as inscrições com mais cuidado você nota que cada letra parece estar ligada a um símbolo ou figura...  Role o dado para determinar se você consegue decifrar este enigma.',
     options: [
       {
         text: 'Rolar o dado',
@@ -1100,13 +1101,13 @@ const textNodes = [
     id: 13.11,
     imgSrc1: "",
     imgSrc2: "",
-    textLeft: 'Você jogou o dado e tirou 2. Com esse resultado, você não consegue decifrar o enigma e o portão permanece fechado.',
+    textLeft: 'Você jogou o dado e tirou menos de 3. Com esse resultado, você não consegue decifrar o enigma e o portão permanece fechado.',
     textRight: 'Clargoth olha para você e diz: "Parece que não temos conhecimento mágico suficiente para resolver isto... Melhor voltarmos e tentar por outro caminho"',
     options: [
       {
         text: 'Voltar',
         nextText: 13,
-        setState: { failForest: true },
+        setState: { skipForest: true },
       },
     ]
   },
@@ -1114,8 +1115,8 @@ const textNodes = [
     id: 13.114,
     imgSrc1: "",
     imgSrc2: "",
-    textLeft: 'Você jogou o dado e tirou 5. Com esse resultado, você consegue decifrar o primeiro enigma e palavras começam a surgir flutuando em frente ao portão.',
-    textRight: 'Clargoth olha para você e diz: "Parece que você é mais habilidoso do que eu pensava. Continue tentando, vamos ver o que acontece."',
+    textLeft: 'Você jogou o dado e tirou mais de 3. Com esse resultado, você consegue decifrar o primeiro enigma e palavras começam a surgir flutuando em frente ao portão.',
+    textRight: `Clargoth olha para você e diz: "Parece que você é mais habilidoso do que eu pensava, continue assim! Vamos ver o que acontece..."`,
     options: [
       {
         text: 'Continuar',
@@ -1133,11 +1134,13 @@ const textNodes = [
     options: [
       {
         text: 'Dragão',
-        nextText: 13.15
+        nextText: 13.15,
+        setState: { skipForest: true }
       },
       {
         text: 'Fada',
-        nextText: 13.15
+        nextText: 13.15,
+        setState: { skipForest: true }
       },
       {
         text: 'Fantasma',
@@ -1156,11 +1159,13 @@ const textNodes = [
     options: [
       {
         text: 'Pelo rio',
-        nextText: 13.2
+        nextText: 13.2,
+        setState: { skipForest: true }
       },
       {
         text: 'Caminho do deserto',
-        nextText: 13.3
+        nextText: 13.3,
+        setState: { skipForest: true }
       },
     ]
   },
@@ -1177,7 +1182,7 @@ const textNodes = [
         nextText: 13.16
       }, {
         text: 'Acho melhor um por vez',
-        nextText: 13.16
+        nextText: 13.17
       }
     ]
   },
@@ -1185,14 +1190,13 @@ const textNodes = [
     id: 13.16,
     imgSrc1: "",
     imgSrc2: "",
-    textLeft: 'Você concorda com a ideia e todos começam a atravessar a ponte. Durante o caminho a ponte começa a balançar violentamente, Clargoth, que está no meio, começa a cantar uma música de guerra dos orcs para manter a concentração e a coragem do bando.',
+    textLeft: 'Você concorda com a ideia e com cuidado e determinação, vocês começam a caminhar pela ponte. Durante o caminho a ponte começa a balançar violentamente, Clargoth, que está no meio, começa a cantar uma música de guerra dos orcs para manter a concentração e a coragem do bando.',
     textRight: `<h4>Role um dado de seis lados para determinar se você consegue atravessar a ponte com segurança ou não.</h4>
     Agora é hora de testar a sua sorte.`,
     options: [
       {
         text: 'Jogar o dado',
         rollTheDice: [13.163, 13.162, 13.161],
-
       }
     ]
   },
@@ -1201,24 +1205,280 @@ const textNodes = [
     imgSrc1: "",
     imgSrc2: "",
     textLeft: 'Você jogou o dado e tirou 6. Com esse resultado, você consegue atravessar a ponte sem problemas e chegar ao outro lado em segurança.',
-    textRight: 'Parabéns pela travessia bem-sucedida!'
+    textRight: 'Parabéns pela travessia bem-sucedida!',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.18
+      }
+    ]
   },
   {
     id: 13.162,
     imgSrc1: "",
     imgSrc2: "",
-    textLeft: 'Você jogou o dado e tirou 4. Apesar de enfrentar algumas dificuldades durante a travessia e acabar sofrendo alguns arranhões e cortes leves, você consegue chegar ao outro lado.',
-    textRight: 'Apesar dos contratempos, você chegou ao seu destino.'
+    textLeft: 'Você jogou o dado e tirou 4. No meio da travessia, um forte vento repentinamente sacode a ponte com violência. Vocês se seguram com ainda mais força, mas um dos degraus se solta, colocando em risco a estabilidade da passagem.',
+    textRight: 'Apesar dos contratempos, e com mais alguns novos arranhões, você conseguiu chegar ao outro lado.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.18
+      }
+    ]
   },
   {
     id: 13.163,
     imgSrc1: "",
     imgSrc2: "",
-    textLeft: 'Você jogou o dado e tirou 1. Infelizmente, você perdeu o equilíbrio durante a travessia e caiu no abismo. Sofrendo um dano significativo, você precisa encontrar uma forma de se recuperar antes de continuar a missão.',
-    textRight: 'Que azar! Mas não desista, ainda há muito a ser feito.'
+    textLeft: 'Você jogou o dado e tirou 1. Vocês começam a caminhar com cuidado sobre a estrutura instável. No entanto, a combinação dos fortes ventos e a deterioração dos suportes da ponte provoca um colapso súbito. A estrutura cede sob o peso de vocês, e a ponte desaba, lançando todos em direção ao abismo.',
+    textRight: 'Por um golpe de sorte, vocês conseguem se segurar nas bordas da ravina, evitando uma queda fatal. No entanto, a queda brusca causa alguns ferimentos entre os membros do grupo. Vocês percebem que precisam buscar uma rota alternativa para alcançar o artefato mágico. Clargoth, mesmo ferido, lidera a discussão sobre o próximo passo a ser tomado.',
+    options: [
+      {
+        text: 'Iremos pelo rio',
+        nextText: 13.2,
+        setState: { skipForest: true }
+      },
+      {
+        text: 'Vamos no caminho do deserto',
+        nextText: 13.3,
+        setState: { skipForest: true }
+      },
+    ]
   },
   {
-    id: 12,
+    id: 13.17,
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Você expressa sua preocupação com a instabilidade da ponte e sugere que atravessar um por vez pode ser mais seguro. Clargoth hesita por um momento, mas acaba concordando com a sua abordagem cautelosa.',
+    textRight: 'Clargoth inicia a travessia com cuidado, testando cada degrau antes de avançar. Apesar de enfrentar alguns momentos de tensão com o balanço da ponte, ele consegue chegar ao outro lado em segurança!',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.171
+      }
+    ]
+  },
+  {
+    id: 13.171,
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Agora, é a sua vez de enfrentar o desafio. Com o coração acelerado, você começa a atravessar a ponte, concentrando-se em seguir os passos de Clargoth. Cada passo é uma batalha contra o medo e a incerteza, mas a sua determinação e foco o ajudam a superar o desafio.',
+    textRight: 'Finalmente, você alcança o outro lado, onde Clargoth o recebe com um sorriso de alívio.',
+    options: [
+      {
+        text: 'Continuar',
+        nextText: 13.18
+      }
+    ]
+  },
+  {
+    id: 13.18,
+    imgSrc1: "./imgs/dungeonCave.jpg",
+    imgSrc2: "",
+    textLeft: 'Após atravessarem a ponte com sucesso, vocês continuam pela trilha, adentrando cada vez mais nas profundezas da montanha. A atmosfera ao redor parece carregada de mistério e energia ancestral, aumentando a tensão entre o grupo.',
+    textRight: 'Enquanto avançam, vocês se deparam com uma imponente estrutura de pedra, com arcos antigos e ornamentos misteriosos esculpidos nas paredes, coberta pelas rochas há uma pequena passagem...  Clargoth, ao se aproximar, ativa o selo mágico do portão, que então se abre revelando um caminho guiado pelas tochas.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 14
+      }
+    ]
+  },
+  {
+    id: 14, // A MASMORRA!
+    imgSrc1: "",
+    imgSrc2: "./imgs/clargoth.png",
+    textLeft: 'Ao se aproximarem ainda mais da entrada da masmorra, vocês sentem uma aura de mistério e perigo envolvendo o local. A entrada é escura e sinistra, com um ar de abandono e desolação que ecoa pelas paredes de pedra.',
+    textRight: 'Clargoth olha para você e para os outros membros do grupo, com uma expressão séria e determinada, ele diz: "Chegamos ao nosso destino final. A masmorra onde o artefato mágico está guardado... Será que estamos prontos para enfrentar os desafios que nos aguardam lá dentro?"',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 14.1
+      }
+    ]
+  },
+  {
+    id: 14.1,
+    imgSrc1: "",
+    imgSrc2: "./imgs/clargHappy.png",
+    textLeft: 'Clargoth ri alto, empolgado pela iminente batalha. "HAHAHA! É claro que estamos! Vamos mostrar a esses monstros quem são as verdadeiras feras aqui!", ele exclama enquanto ergue seu machado com confiança.',
+    textRight: 'Um calafrio percorre sua espinha enquanto você engole em seco. A escuridão da masmorra é palpável, apenas o som dos seus passos ecoando nas paredes de pedra... O grupo avança com cautela, prontos para enfrentar qualquer desafio.',
+    options: [
+      {
+        text: 'Continuar',
+        nextText: 14.2
+      }
+    ]
+  },
+  {
+    id: 14.2,
+    imgSrc1: "",
+    imgSrc2: "./imgs/cavernTorch.jpg",
+    textLeft: 'A luzes das tochas tremem, lançando sombras dançantes nas paredes úmidas da masmorra. Vocês avançam por corredores estreitos e câmaras escuras, sempre atentos a cada ruído.',
+    textRight: 'De repente, vocês se deparam com uma bifurcação. À esquerda, um corredor estreito e sombrio. À direita, uma porta de madeira carcomida. Qual caminho vocês escolhem?',
+    options: [
+      {
+        text: 'Seguir pela esquerda',
+        nextText: 14.3
+      },
+      {
+        text: 'Investigar a porta à direita',
+        nextText: 14.4
+      }
+    ]
+  },  
+  {
+    id: 14.3, // esquerda
+    imgSrc1: "",
+    imgSrc2: "./imgs/endlessCave.png",
+    textLeft: 'O corredor estreito parece se estender infinitamente na escuridão. Vocês avançam com cautela, ouvindo apenas o som dos próprios passos e o eco distante de algo desconhecido.',
+    textRight: 'Após alguns minutos de caminhada, vocês se deparam com uma sala iluminada por uma fraca luz azul. No centro, um altar antigo parece ser o foco da luminosidade. O que vocês fazem?',
+    options: [
+      {
+        text: 'Investigar o altar',
+        nextText: 14.5
+      },
+      {
+        text: 'Continuar explorando o corredor',
+        nextText: 14.6
+      }
+    ]
+  },
+  {
+    id: 14.4, // direita
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'A porta range quando é aberta, revelando uma sala empoeirada e esquecida pelo tempo. Pilhas de caixas e barris se acumulam nos cantos, obscurecendo parte do ambiente.',
+    textRight: 'Enquanto vocês examinam o local, um ruído estranho ecoa das sombras. Antes que possam reagir, uma criatura esguia e ágil salta das sombras, pronta para atacar!',
+    options: [
+      {
+        text: 'Lutar contra a criatura',
+        nextText: 14.7
+      },
+      {
+        text: 'Fugir pela porta',
+        nextText: 14.8
+      }
+    ]
+  },
+  {
+    id: 14.5, // esquerda altar
+    imgSrc1: "",
+    imgSrc2: "./imgs/altar.jpg",
+    textLeft: 'Ao se aproximar do altar, você sente uma energia antiga e poderosa emanando dele. No entanto, antes que possam investigar mais a fundo, o chão começa a tremer e as paredes da sala começam a se fechar!',
+    textRight: 'Com pouco tempo para reagir, vocês correm em direção à saída, escapando por pouco antes que a sala se feche completamente. Agora, o que fazer?',
+    options: [
+      {
+        text: 'Explorar outra parte da masmorra',
+        nextText: 14.9 // ignora tudo
+      },
+      {
+        text: 'Voltar e enfrentar o desafio do altar',
+        nextText: 14.11
+      }
+    ]
+  },
+  {
+    id: 14.6, // esquerda sem altar
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'O corredor continua se estendendo, levando vocês a uma série de câmaras escuras e sinistras. Porém, após uma longa caminhada, vocês se encontram diante de uma porta de ferro maciço.',
+    textRight: 'Ela não parece estar trancada, diz Clargoth. Vocês conseguem abrir a porta, revelando um vasto salão com pilares de pedra e novamente um altar no centro. Mas dessa vez, parece que vocês entraram pelos fundos da sala. Antes que possam avançar, uma voz ecoa pelo salão, desafiando-os a um jogo de inteligência.',
+    options: [
+      {
+        text: 'Aceitar o desafio',
+        nextText: 14.11
+      },
+      {
+        text: 'Ignorar a voz e avançar para o altar',
+        nextText: 14.12
+      }
+    ]
+  },
+  {
+    id: 14.7, // direita, lutar com mini-boss
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'A criatura ataca com ferocidade, seus olhos brilhando com fúria. Uma batalha feroz se desenrola, com vocês lutando pela vida contra o monstro das sombras.',
+    textRight: 'Apesar dos ferimentos, vocês emergem vitoriosos da batalha. Com a criatura derrotada, vocês continuam sua jornada pela masmorra, prontos para enfrentar o que quer que venha a seguir.',
+    options: [
+      {
+        text: 'Continuar explorando a masmorra',
+        nextText: 14.9
+      }
+    ]
+  },
+  {
+    id: 14.8, // direita sem mini-boss
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Sem hesitar, vocês fogem pela porta, deixando a criatura furiosa para trás. Correndo pelo corredor escuro, vocês conseguem escapar por pouco, mas o encontro com o monstro deixa uma sensação de perigo iminente no ar.',
+    textRight: 'Depois de alguns minutos de corrida frenética, vocês param para recuperar o fôlego. Agora, o que fazer?',
+    options: [
+      {
+        text: 'Retornar e enfrentar a criatura',
+        nextText: 14.7
+      },
+      {
+        text: 'Continuar explorando a masmorra',
+        nextText: 14.9
+      }
+    ]
+  },
+  {
+    id: 14.11, // desafio do altar (esquerda)
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Aceitando o desafio da voz, vocês se veem envolvidos em um jogo de raciocínio e estratégia. Com determinação e astúcia, vocês conseguem superar os obstáculos e alcançar o altar, onde uma recompensa aguarda.',
+    textRight: 'Agora mais sábios e preparados, vocês continuam sua jornada pela masmorra, prontos para enfrentar o que quer que o destino lhes reserve.',
+    options: [
+      {
+        text: 'Continuar explorando a masmorra',
+        nextText: 14.9
+      }
+    ]
+  },
+  {
+    id: 14.12, // ignorando a voz (armadilha) (esquerda)
+    imgSrc1: "",
+    imgSrc2: "./imgs/altar.jpg",
+    textLeft: 'Ignorando a voz misteriosa, vocês avançam para o altar, determinados a alcançar seu objetivo. No entanto, à medida que se aproximam, uma armadilha é ativada, aprisionando-os em uma jaula de energia mágica.',
+    textRight: 'Agora, vocês devem encontrar uma maneira de escapar antes que seja tarde demais. Com a mente afiada e a determinação renovada, vocês buscam uma saída enquanto a masmorra se fecha em torno de vocês.',
+    options: [
+      {
+        text: 'Buscar uma saída da armadilha',
+        nextText: 14.13
+      }
+    ]
+  },
+  {
+    id: 14.13, // desafio da armadilha (esquerda)
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'A armadilha mágica se fecha em torno de vocês, aprisionando-os em uma jaula de energia pulsante. No entanto, ao examinar o ambiente com atenção, vocês notam um padrão nos símbolos que adornam as paredes.',
+    textRight: 'Com astúcia e raciocínio rápido, vocês conseguem decifrar o padrão e desativar a armadilha, ganhando sua liberdade mais uma vez. Agora, o que fazer?',
+    options: [
+      {
+        text: 'Continuar explorando a masmorra',
+        nextText: 14.9
+      }
+    ]
+  },
+  {
+    id: 14.9, // Final de todos os caminhos
+    imgSrc1: "",
+    imgSrc2: "./imgs/tarasconaDoor.png",
+    textLeft: 'Ainda há muito a explorar na masmorra, e cada passo traz novos desafios e perigos. Com determinação, vocês avançam mais fundo nas profundezas, preparados para enfrentar o que quer que o destino lhes reserve.',
+    textRight: 'Depois de horas de exploração, vocês finalmente encontram o que procuravam: a lendária Tarascona, um dragão tartaruga com escamas reluzentes e olhos penetrantes. O confronto final está prestes a começar!',
+    options: [
+      {
+        text: 'Preparar para a batalha contra Tarascona',
+        nextText: 15
+      }
+    ]
+  },
+  {
+    id: 12, // sem Clargoth
     imgSrc1: "./imgs/bard.png",
     imgSrc2: "",
     textLeft: 'As horas passam... Os exploradores beberam mais do que deveriam. Garrick, o bardo, cantava canções antigas em voz alta, enquanto Clargoth, batia em sua mesa com a caneca, rindo das piadas sujas que seus outros parceiros contavam.',
@@ -1227,7 +1487,6 @@ const textNodes = [
       {
         text: 'Este caminho ainda está em construção',
         requiredState: (currentState) => currentState.skipClargoth,
-        nextText: -1,
       }
     ]
   }
