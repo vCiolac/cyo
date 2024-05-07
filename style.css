@@ -94,8 +94,8 @@ header {
 #actionControls,
 #pageControls {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
 }
 
 #name {
@@ -221,11 +221,6 @@ header {
 
   #bars {
     flex-direction: column;
-  }
-
-  #actionControls {
-    flex-direction: row;
-    justify-content: center;
   }
 
   #name {

@@ -28,9 +28,9 @@ function loadGameState() {
   const savedState = JSON.parse(localStorage.getItem('gameState'));
   const savedPages = localStorage.getItem('gamePage');
   hpFirstGrandChild.style.width = `${savedState.hp}%` ?? 100 + '%';
-  mpFirstGrandChild.style.width = `${savedState.mp}%`?? 100 + '%';
+  mpFirstGrandChild.style.width = `${savedState.mp}%` ?? 100 + '%';
   xpFirstGrandChild.style.width = `${savedState.xp}%` ?? 0 + '%';
-  if (savedState !== null || savedPages !== null ) {
+  if (savedState !== null || savedPages !== null) {
     state = savedState;
     level.innerHTML = savedState.level ?? 1;
     showTextNode(JSON.parse(savedPages));
@@ -254,11 +254,11 @@ function selectOption(option) {
   history.push(nextTextNodeId);
   historyState = Object.assign({}, state);
   backButtonClicked = false;
-  if (nextTextNodeId === 5.4 || nextTextNodeId === 13.15 || nextTextNodeId === 13.163) {
+  if (nextTextNodeId === 5.4 || nextTextNodeId === 13.15 || nextTextNodeId === 13.163 || nextTextNodeId === 13.7 || nextTextNodeId === 13.5) {
     controlProgress("hp", 'down', 10);
     playAudio('./mp3/hit30.mp3.flac');
   }
-  if (nextTextNodeId === 13.162) {
+  if (nextTextNodeId === 13.162 || nextTextNodeId === 13.6 || nextTextNodeId === 13.8) {
     controlProgress("mp", 'down', 5);
     playAudio('./mp3/hit30.mp3.flac');
   }
@@ -274,6 +274,10 @@ function selectOption(option) {
   }
   if (nextTextNodeId === 12 || nextTextNodeId === 4) {
     playAudio('./mp3/medieval_loop.wav');
+  }
+  if (nextTextNodeId === 13.91) {
+    controlProgress('xp', 'up', 50);
+    playAudio('./mp3/up.wav')
   }
   if (nextTextNodeId <= 0) {
     return restart();
@@ -443,7 +447,7 @@ function returnBackwards() {
   }
 };
 
-function returnLocalStorageBackwards(lastPage) {  
+function returnLocalStorageBackwards(lastPage) {
   localStorage.setItem('gameState', JSON.stringify(state));
   localStorage.setItem('gamePage', JSON.stringify(lastPage));
 };
@@ -1285,6 +1289,337 @@ const textNodes = [
     ]
   },
   {
+    id: 13.2, // Pelo Rio
+    imgSrc1: "",
+    imgSrc2: "./imgs/river.jpg",
+    textLeft: 'Decidindo seguir pelo rio, vocês encontram um pequeno barco de madeira na margem do rio e votam que o melhor é navegar. O rio serpenteia entre as árvores, refletindo os raios de sol que atravessam a densa folhagem.',
+    textRight: 'Enquanto remam silenciosamente, vocês avistam uma série de pedras afiadas emergindo das águas turbulentas à frente. Parece haver um caminho estreito entre elas, mas é difícil de navegar.',
+    options: [
+      {
+        text: 'Continuar remando com cautela',
+        nextText: 13.21
+      },
+      {
+        text: 'Parar e tentar encontrar um caminho alternativo',
+        nextText: 13.22
+      }
+    ]
+  },
+  {
+    id: 13.22,
+    imgSrc1: "",
+    imgSrc2: "./imgs/riverTrail.jpg",
+    textLeft: 'Optando por encontrar um caminho alternativo, vocês desembarcam do barco e começam a explorar a margem do rio em busca de uma rota mais segura.',
+    textRight: 'Role o dado para determinar se vocês conseguem encontrar um caminho seguro.',
+    options: [
+      {
+        text: 'Rolar o dado',
+        rollTheDice: [13.222, 13.221, 13.223],
+      }
+    ]
+  },
+  {
+    id: 13.221,
+    imgSrc1: "",
+    imgSrc2: "./imgs/riverFoot2.jpg",
+    textLeft: 'Você jogou o dado e tirou 3. Com esse resultado, vocês conseguem encontrar uma pequena trilha que percorre pela margem do rio.',
+    textRight: '"Olhem ali! Parece que há uma trilha maior. Vamos por ali, será mais seguro." Clargoth aponta para uma passagem estreita que se abre entre as árvores.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.23
+      }
+    ]
+  },
+  {
+    id: 13.222,
+    imgSrc1: "",
+    imgSrc2: "./imgs/riverFalls.jpg",
+    textLeft: 'Você jogou o dado e tirou 1. Infelizmente, a busca por um caminho alternativo não dá frutos e vocês acabam perdendo tempo. Em contra partida, um de seus companheiros, responsável por ficar de olho no barco, acaba se descuidando e deixa a correnteza levar o barco embora.',
+    textRight: 'Enquanto o barco desaparece rio abaixo, não lhes resta outra opção a não ser desistir desta rota. "Seguir o resto do caminho a pé sem uma trilha vai ser muito cansativo, podemos nos perder... E este rio não me parece muito amigável, mesmo se construíssemos uma jangada." Diz Clargoth.',
+    options: [
+      {
+        text: 'Voltar',
+        nextText: 13,
+        setState: { skipRiver: true }
+      }
+    ]
+  },
+  {
+    id: 13.223,
+    imgSrc1: "",
+    imgSrc2: "./imgs/riverFoot.jpg",
+    textLeft: 'Você jogou o dado e tirou 6. Com esse resultado, vocês encontram um desvio seguro que os leva além das pedras afiadas, evitando o perigo iminente.',
+    textRight: '"Uau, que sorte encontrarmos essa passagem tão segura! Parece que estamos destinados a chegar à masmorra sem grandes obstáculos." Diz Clargoth, aliviado.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.23
+      }
+    ]
+  },
+  {
+    id: 13.21, // continuar remando
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Vocês remam com determinação, mas uma correnteza repentina arrasta o barco em direção a uma das rochas. Vocês precisam agir rápido para evitar uma colisão perigosa!',
+    textRight: 'Role o dado para determinar se vocês conseguem desviar da rocha com sucesso.',
+    options: [
+      {
+        text: 'Rolar o dado',
+        rollTheDice: [13.222, 13.221, 13.223],
+      }
+    ]
+  },
+  {
+    id: 13.221,
+    imgSrc1: "",
+    imgSrc2: "./imgs/riverGood.jpg",
+    textLeft: 'Você jogou o dado e tirou 4. Com esse resultado, vocês conseguem desviar da rocha a tempo, evitando um desastre iminente. O barco continua sua jornada pelo rio, agora mais consciente dos perigos que enfrentam.',
+    textRight: '"Ufa, por pouco não colidimos com aquela rocha! Vamos manter a atenção, pessoal, ainda temos um longo caminho pela frente." Diz Clargoth, alertando o grupo.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.23
+      }
+    ]
+  },
+  {
+    id: 13.222,
+    imgSrc1: "",
+    imgSrc2: "./imgs/riverFalls.jpg",
+    textLeft: 'Você jogou o dado e tirou 2. Infelizmente, vocês não conseguem desviar a tempo e o barco colide com a rocha, lançando todos para a água. Com esforço, vocês conseguem sair do rio, mas estão molhados e cansados.',
+    textRight: '"Parece que a sorte não está ao nosso lado desta vez... Mas não desanimem, a masmorra está próxima." Diz Clargoth, tentando manter o ânimo do grupo.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.23,
+        setState: { fatigued: true }
+      }
+    ]
+  },
+  {
+    id: 13.223,
+    imgSrc1: "",
+    imgSrc2: "./imgs/riverGood.jpg",
+    textLeft: 'Você jogou o dado e tirou 6. Com esse resultado, vocês desviam habilmente da rocha, mantendo o controle sobre o barco. A aventura pelo rio continua sem contratempos, enquanto vocês se aproximam cada vez mais da entrada da masmorra.',
+    textRight: '"Olhem ali! Parece que tem um desvio no rio que contorna as pedras. Vamos por ali, será mais seguro." Clargoth aponta para uma passagem estreita que se abre em um rio calmo e tranquilo.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.23
+      }
+    ]
+  },
+  {
+    id: 13.23,
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Após uma jornada cheia de desafios, vocês finalmente avistam a porta da masmorra. O local é sombrio e imponente, com sinais de antigos confrontos gravados em suas paredes de pedra.',
+    textRight: 'Clargoth observa com um olhar sério e determinado. Ele se aproxima do grupo e diz: "Chegamos ao nosso destino final. Vamos desembarcar e nos preparar. Rápido! O artefato nos espera, eu posso ouvir o chamado dele."',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 14
+      }
+    ]
+  },  
+  {
+    id: 13.3, // Caminho do Deserto
+    imgSrc1: "",
+    imgSrc2: "./imgs/desert.jpg",
+    textLeft: 'Decidindo seguir pelo caminho do deserto, vocês deixam a vegetação densa da floresta para trás e adentram um vasto e árido deserto. O sol escaldante brilha impiedosamente sobre a paisagem desolada, criando ilusões de água no horizonte distante.',
+    textRight: 'Enquanto avançam pelas dunas de areia, vocês avistam uma série de ruínas antigas erguendo-se das areias douradas à frente. Parece haver uma passagem estreita entre as estruturas, mas é difícil de navegar.',
+    options: [
+      {
+        text: 'Continuar com cautela',
+        nextText: 13.31
+      },
+      {
+        text: 'Parar e procurar por uma rota alternativa',
+        nextText: 13.32
+      }
+    ]
+  },
+  {
+    id: 13.32,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desertAway.jpg",
+    textLeft: 'Optando por procurar uma rota alternativa, vocês desviam do caminho principal e começam a explorar os arredores do deserto em busca de uma passagem mais segura.',
+    textRight: 'Role o dado para determinar se vocês conseguem encontrar uma rota segura.',
+    options: [
+      {
+        text: 'Rolar o dado',
+        rollTheDice: [13.322, 13.321, 13.323],
+      }
+    ]
+  },
+  {
+    id: 13.321,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desert1.jpg",
+    textLeft: 'Você jogou o dado e tirou 4. Com esse resultado, vocês descobrem um antigo caminho de caravanas que contorna as ruínas, oferecendo uma rota mais segura através do deserto.',
+    textRight: '"Olhem ali! Parece que há uma trilha antiga que nos levará ao redor das ruínas. Vamos por ali, será mais seguro." Clargoth aponta para um caminho sinuoso que se abre entre as dunas de areia.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.33
+      }
+    ]
+  },
+  {
+    id: 13.322,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desert3.jpg",
+    textLeft: 'Você jogou o dado e tirou 1. Infelizmente, a busca por uma rota alternativa não dá frutos e vocês acabam perdendo tempo. Em contra partida, as areias movediças do deserto começam a engolir suas pegadas, tornando a jornada ainda mais difícil.',
+    textRight: 'Enquanto as provisões desaparecem nas areias traiçoeiras, vocês percebem que precisam retornar ao caminho principal ou correm o risco de se perderem no deserto. "Não podemos nos dar ao luxo de desperdiçar mais tempo aqui. Vamos voltar ao caminho principal antes que seja tarde demais." Diz Clargoth, preocupado.',
+    options: [
+      {
+        text: 'Voltar',
+        nextText: 13,
+        setState: { skipDesert: true }
+      }
+    ]
+  },
+  {
+    id: 13.323,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desert1.jpg",
+    textLeft: 'Você jogou o dado e tirou 6. Com esse resultado, vocês encontram uma rota alternativa que os leva além das ruínas, evitando o perigo iminente.',
+    textRight: '"Uau, que sorte encontrarmos esse desvio tão seguro! Parece que estamos destinados a chegar à masmorra sem grandes obstáculos." Diz Clargoth, aliviado.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.33
+      }
+    ]
+  },
+  {
+    id: 13.31,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desert1.jpg",
+    textLeft: 'Vocês avançam com cautela pelas ruínas, desviando dos destroços e dos perigos ocultos sob a areia. A cada passo, a sensação de que estão sendo observados cresce, alimentando a tensão entre o grupo.',
+    textRight: 'Enquanto exploram as ruínas, vocês se deparam com uma passagem estreita entre as estruturas, que parece levar em direção ao coração do deserto. Parece ser a única opção viável para continuar a jornada.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.33
+      }
+    ]
+  },
+  {
+    id: 13.33, // luta
+    imgSrc1: "",
+    imgSrc2: "./imgs/desertMonster.jpg",
+    textLeft: 'Após atravessarem a passagem com sucesso, vocês continuam a jornada pelo deserto, adentrando cada vez mais nas profundezas da vastidão árida. A atmosfera ao redor parece carregada de mistério e perigo, aumentando a tensão entre o grupo.',
+    textRight: 'Quando menos esperam, um rugido ecoa pelas dunas de areia, seguido por um tremor no solo. Diante de vocês, emerge uma criatura colossal, com um corpo humanoide, sua aura pulsa uma magia antiga e uma fome primordial, diante de vocês, pronta para se saciar!',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 13.4
+      }
+    ]
+  },
+  {
+    id: 13.4,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desertMonsterBattle.jpg",
+    textLeft: 'O monstro avança com fúria implacável, seus olhos brilhando com uma intensidade sobrenatural. Vocês se preparam para o confronto iminente, cada músculo tenso e alerta para o perigo iminente.',
+    textRight: 'Agora é hora de decidir como enfrentar essa ameaça. Escolha sua ação com sabedoria:',
+    options: [
+      {
+        text: 'Atacar',
+        nextText: 13.5
+      },
+      {
+        text: 'Defender',
+        nextText: 13.6
+      },
+      {
+        text: 'Recuar',
+        nextText: 13.7
+      }
+    ]
+  },
+  {
+    id: 13.5,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desertMonsterBattle.jpg",
+    textLeft: 'Você decide atacar, lançando-se contra o monstro com bravura e determinação. Seus golpes encontram seu alvo, causando dano significativo ao adversário, mas não sem sofrer ferimentos em troca.',
+    textRight: 'O monstro retalha com suas garras afiadas, desferindo golpes poderosos contra você e seus companheiros. O confronto é intenso e implacável, cada lado lutando ferozmente pela supremacia. Você perde 5 pontos de vida',
+    options: [
+      {
+        text: 'Continuar lutando',
+        nextText: 13.8
+      }
+    ]
+  },
+  {
+    id: 13.6,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desertMonsterBattle.jpg",
+    textLeft: 'Você opta por adotar uma postura defensiva, preparando-se para resistir aos ataques do monstro. Sua estratégia mostra-se eficaz, permitindo-lhe mitigar parte do dano infligido pelo inimigo.',
+    textRight: 'O monstro investe com ferocidade, mas sua defesa firme e calculada impede que a maioria dos golpes cause danos graves. Vocês conseguem manter-se firmes diante da investida do adversário.',
+    options: [
+      {
+        text: 'Continuar lutando',
+        nextText: 13.8
+      }
+    ]
+  },
+  {
+    id: 13.7,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desertMonsterBattle.jpg",
+    textLeft: 'Você tenta recuar para uma posição mais segura, mas o monstro bloqueia seu caminho, determinado a não deixar nenhum de vocês escapar. Suas garras afiadas brilham perigosamente, prontas para desferir golpes mortais.',
+    textRight: 'Antes que possam recuar, o monstro avança, atacando com fúria selvagem. Vocês são pegos desprevenidos, sofrendo ferimentos enquanto lutam para se defenderem. Você perde 10 pontos de vida',
+    options: [
+      {
+        text: 'Continuar lutando',
+        nextText: 13.8
+      }
+    ]
+  },
+  {
+    id: 13.8,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desertMonsterBattle.jpg",
+    textLeft: 'A batalha se intensifica, com ambos os lados trocando golpes brutais e investidas ousadas. Vocês lutam com todas as suas forças, determinados a derrotar o monstro e proteger uns aos outros.',
+    textRight: 'Seu esforço conjunto começa a dar frutos, com o monstro mostrando sinais de fadiga após sofrer uma série de golpes poderosos. É hora de pressionar o ataque e acabar com essa ameaça de uma vez por todas.',
+    options: [
+      {
+        text: 'Atacar novamente',
+        nextText: 13.9
+      }
+    ]
+  },
+  {
+    id: 13.9,
+    imgSrc1: "",
+    imgSrc2: "./imgs/desertMonster.jpg",
+    textLeft: 'Com determinação renovada, vocês avançam com uma ferocidade renovada, concentrando seus ataques no monstro fatigado. Seus esforços conjuntos finalmente rendem frutos, e o monstro cai, derrotado, diante de vocês.',
+    textRight: 'A criatura solta um rugido final, seu corpo desmoronando no chão da areia. Vocês triunfaram sobre o desafio, unidos pela coragem e pela determinação de enfrentar o perigo juntos.',
+    options: [
+      {
+        text: 'Continuar',
+        nextText: 13.91
+      }
+    ]
+  },  
+  {
+    id: 13.91,
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Com o monstro derrotado, vocês recuperam o fôlego e avaliam os danos sofridos durante a batalha. Apesar dos ferimentos e da fadiga, vocês permanecem firmes e determinados a continuar a jornada.',
+    textRight: 'Clargoth se aproxima do grupo, um sorriso de alívio no rosto. "Vocês foram incríveis! Juntos, somos capazes de superar qualquer desafio que a masmorra nos apresentar!". Você ganhou 50 pontos de experiência.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 14
+      }
+    ]
+  },
+  {
     id: 14, // A MASMORRA!
     imgSrc1: "",
     imgSrc2: "./imgs/clargoth.png",
@@ -1319,18 +1654,19 @@ const textNodes = [
     options: [
       {
         text: 'Seguir pela esquerda',
-        nextText: 14.3
+        nextText: 14.3,
+        requiredState: (currentState) => !currentState.trollEncounter,
       },
       {
         text: 'Investigar a porta à direita',
         nextText: 14.4
       }
     ]
-  },  
+  },
   {
     id: 14.3, // esquerda
-    imgSrc1: "",
-    imgSrc2: "./imgs/endlessCave.png",
+    imgSrc1: "./imgs/endlessCave.png",
+    imgSrc2: "./imgs/altar.jpg",
     textLeft: 'O corredor estreito parece se estender infinitamente na escuridão. Vocês avançam com cautela, ouvindo apenas o som dos próprios passos e o eco distante de algo desconhecido.',
     textRight: 'Após alguns minutos de caminhada, vocês se deparam com uma sala iluminada por uma fraca luz azul. No centro, um altar antigo parece ser o foco da luminosidade. O que vocês fazem?',
     options: [
@@ -1362,28 +1698,153 @@ const textNodes = [
     ]
   },
   {
-    id: 14.5, // esquerda altar
+    id: 14.5, // esquerda Investigar o altar
     imgSrc1: "",
     imgSrc2: "./imgs/altar.jpg",
     textLeft: 'Ao se aproximar do altar, você sente uma energia antiga e poderosa emanando dele. No entanto, antes que possam investigar mais a fundo, o chão começa a tremer e as paredes da sala começam a se fechar!',
-    textRight: 'Com pouco tempo para reagir, vocês correm em direção à saída, escapando por pouco antes que a sala se feche completamente. Agora, o que fazer?',
+    textRight: 'Com pouco tempo para reagir, vocês precisam correr em direção à saída, na tentativa de escapar antes que a sala se feche completamente. Será que a sorte está ao seu lado?',
     options: [
       {
-        text: 'Explorar outra parte da masmorra',
-        nextText: 14.9 // ignora tudo
-      },
-      {
-        text: 'Voltar e enfrentar o desafio do altar',
-        nextText: 14.11
+        text: 'Rolar o dado',
+        rollTheDice: [14.51, 14.51, 14.52]
       }
     ]
   },
   {
-    id: 14.6, // esquerda sem altar
+    id: 14.51, // tentativa de escapar do altar
     imgSrc1: "",
     imgSrc2: "",
+    textLeft: 'Você jogou o dado e tirou 1. Com esse resultado, você não consegue escapar a tempo e as paredes se fecham, prendendo vocês na sala. A escuridão envolve vocês, e o ar começa a ficar escasso...',
+    textRight: 'Por alguma sorte ou benção do acaso, parece que ninguém está ferido, há apenas pedras e mais pedras bloqueando as saídas... E agora? O que vocês fazem?',
+    options: [
+      {
+        text: 'Forçar uma saída',
+        rollTheDice: [14.511, 14.511, 14.512]
+      },
+      {
+        text: 'Gritar por socorro',
+        nextText: 14.53
+      }
+    ]
+  },
+  {
+    id: 14.511, // tentativa de forçar a saída com falha
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Você tenta mover as pedras que bloqueiam a saída, mas elas são pesadas e resistentes. Apesar dos seus esforços, você não consegue abrir caminho para fora da sala.',
+    textRight: 'A situação parece cada vez mais desesperadora, com o ar ficando mais rarefeito e a escuridão se fechando ao seu redor...',
+    options: [
+      {
+        text: 'Gritar por socorro',
+        nextText: 14.53
+      }
+    ]
+  },
+  {
+    id: 14.512, // tentativa de forçar a saída com sucesso
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Vocês se concentram e canalizam todas as suas forças e determinação para mover as pedras que bloqueiam a saída. Com um esforço hercúleo, um pequeno espaço se abre, por onde vocês podem escapar.',
+    textRight: 'Com a respiração ofegante e os músculos doloridos, vocês emergem da sala e continuam sua jornada pela masmorra, prontos para enfrentar o que quer que venha a seguir.',
+    options: [
+      {
+        text: 'Continuar explorando a masmorra',
+        nextText: 14.6,
+        setState: { fatigued: true }
+      }
+    ]
+  },
+  {
+    id: 14.52, // tentativa de escapar da trap do altar com sucesso
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Você jogou o dado e tirou 4. Com esse resultado, vocês conseguem escapar a tempo, correndo pela passagem estreita antes que as paredes se fechem completamente.',
+    textRight: 'Com a respiração ofegante, vocês emergem da sala e continuam sua jornada pela masmorra, prontos para enfrentar o que quer que venha a seguir.',
+    options: [
+      {
+        text: 'Continuar explorando a masmorra',
+        nextText: 14.6
+      }
+    ]
+  },
+  {
+    id: 14.53, // gritar por socorro
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Vocês gritam por socorro, na esperança de que alguém ouça e venha em seu auxílio. No entanto, o som ecoa pelas paredes de pedra, sem resposta.',
+    textRight: 'A situação parece cada vez mais desesperadora, com o ar ficando mais rarefeito e a escuridão se fechando ao seu redor...',
+    options: [
+      {
+        text: 'Continuar gritando',
+        nextText: 14.54
+      }
+    ]
+  },
+  {
+    id: 14.54, // troll da montanha
+    imgSrc1: "",
+    imgSrc2: "./imgs/mountain-troll.png",
+    textLeft: 'Vocês continuam gritando por socorro, quando de repente, uma voz responde de volta. "Quem está aí? O que aconteceu?"',
+    textRight: 'Um troll da montanha surge das sombras, olhando para vocês com curiosidade. "Vocês estão presos? Eu posso ajudar, mas em troca, quero algo em retribuição..."',
+    options: [
+      {
+        text: 'Oferecer uma garrafa de hidromel',
+        nextText: 14.541,
+        requiredState: (currentState) => currentState.mead === 1,
+        setState: { mead: false },
+      },
+      {
+        text: 'Negociar com o troll',
+        rollTheDice: [14.55, 14.55, 14.551]
+      }
+    ]
+  },
+  {
+    id: 14.541, // oferecer hidromel ao troll
+    imgSrc1: "",
+    imgSrc2: "",
+    textLeft: 'Você entrega sua garrafa de hidromel ao troll, que a aceita com um sorriso de satisfação. "Obrigado, a bebida é boa! Agora, eu posso ajudá-los a sair daqui."',
+    textRight: 'O troll empurra as pedras que bloqueiam a saída com facilidade, abrindo um caminho para fora da sala. Logo após ele bebe toda a garrafa e sai andando, deixando vocês sozinhos na masmorra.',
+    options: [
+      {
+        text: 'Continuar',
+        nextText: 14.6
+      }
+    ]
+  },
+  {
+    id: 14.551, // negociar com o troll com exito, leva para 14.6
+    imgSrc1: "",
+    imgSrc2: "./imgs/mountain-troll.png",
+    textLeft: 'Vocês tentam negociar com o troll, oferecendo o que podem em troca de sua ajuda. O troll parece interessado na oferta e aceita ajudá-los a sair da sala.',
+    textRight: 'Com um sorriso amigável, o troll empurra as pedras que bloqueiam a saída, abrindo um caminho para fora da sala. Ele se despede de vocês e sai andando, deixando vocês sozinhos na masmorra.',
+    options: [
+      {
+        text: 'Continuar explorando a masmorra',
+        nextText: 14.6
+      }
+    ]
+  },
+  {
+    id: 14.55, // negociar com o troll, não há nada que ele quer, ele lança uma magia que os expele de volta ao início da masmorra
+    imgSrc1: "",
+    imgSrc2: "./imgs/mountain-troll.png",
+    textLeft: 'Vocês tentam negociar com o troll, oferecendo o que podem em troca de sua ajuda. No entanto, o troll não parece interessado em nada que vocês têm a oferecer.',
+    textRight: 'Com um sorriso malicioso, o troll lança uma magia que os expele de volta ao início da masmorra, deixando vocês desorientados e confusos.',
+    options: [
+      {
+        text: 'Tentar enfrentar a masmorra novamente',
+        nextText: 14,
+        setState: { trollEncounter: true }
+      }
+    ]
+  },
+  {
+    id: 14.6, // esquerda Continuar explorando o corredor
+    imgSrc1: "./imgs/endlessCave.png",
+    imgSrc2: "./imgs/rockDoor.jpg",
     textLeft: 'O corredor continua se estendendo, levando vocês a uma série de câmaras escuras e sinistras. Porém, após uma longa caminhada, vocês se encontram diante de uma porta de ferro maciço.',
-    textRight: 'Ela não parece estar trancada, diz Clargoth. Vocês conseguem abrir a porta, revelando um vasto salão com pilares de pedra e novamente um altar no centro. Mas dessa vez, parece que vocês entraram pelos fundos da sala. Antes que possam avançar, uma voz ecoa pelo salão, desafiando-os a um jogo de inteligência.',
+    textRight: 'Ela não parece estar trancada, diz Clargoth. Vocês conseguem abrir a porta, revelando um vasto salão com pilares de pedra e novamente um altar no centro. Mas dessa vez, parece ser um altar diferente... Antes que possam avançar, uma voz feminina ecoa pelo salão, chamando-os para o centro...',
     options: [
       {
         text: 'Aceitar o desafio',
@@ -1426,40 +1887,147 @@ const textNodes = [
     ]
   },
   {
-    id: 14.11, // desafio do altar (esquerda)
+    id: 14.11, // desafio do altar com a voz
     imgSrc1: "",
-    imgSrc2: "",
-    textLeft: 'Aceitando o desafio da voz, vocês se veem envolvidos em um jogo de raciocínio e estratégia. Com determinação e astúcia, vocês conseguem superar os obstáculos e alcançar o altar, onde uma recompensa aguarda.',
-    textRight: 'Agora mais sábios e preparados, vocês continuam sua jornada pela masmorra, prontos para enfrentar o que quer que o destino lhes reserve.',
+    imgSrc2: "./imgs/orc-female.png",
+    textLeft: 'Aceitando o desafio vocês caminham em direção ao altar, no entanto, à medida que se aproximam, uma sombra se materializa diante de vocês, assumindo a forma do seu maior desejo.',
+    textRight: 'Para Clargoth, a sombra se transforma em uma orc guerreira sedutora, prometendo-lhe poder e glória em troca de sua lealdade. O que vocês fazem?',
     options: [
       {
-        text: 'Continuar explorando a masmorra',
+        text: 'Tentar seduzir a sombra para obter informações',
+        rollTheDice: [14.112, 14.112, 14.113]
+      }
+    ]
+  },
+  {
+    id: 14.112, // Tentar seduzir a sombra
+    imgSrc1: "",
+    imgSrc2: "./imgs/orc-female.png",
+    textLeft: 'Você tenta seduzir a sombra, oferecendo-lhe palavras doces e promessas de lealdade. No entanto, a sombra parece desconfiada e não é facilmente persuadida.',
+    textRight: 'Apesar de seus esforços, a sombra se mantém firme em suas exigências. Parece que vocês terão que recorrer a outras estratégias para obter o que desejam.',
+    options: [
+      {
+        text: 'Lutar contra a sombra',
+        nextText: 14.1121
+      },
+      {
+        text: 'Tentar negociar novamente',
+        rollTheDice: [14.1122, 14.1122, 14.1123]
+      }
+    ]
+  },
+  {
+    id: 14.1121, // Lutar contra a sombra
+    imgSrc1: "",
+    imgSrc2: "./imgs/battle.jpg",
+    textLeft: 'Diante da recusa da sombra em ceder, vocês decidem lutar contra ela. A batalha é feroz e intensa, com a sombra usando magia sombria para atacá-los.',
+    textRight: 'Com habilidade e determinação, vocês conseguem derrotar a sombra, dissipando-a completamente. Agora, vocês estão livres para investigar o altar e prosseguir em sua jornada.',
+    options: [
+      {
+        text: 'Continuar',
         nextText: 14.9
       }
     ]
   },
   {
-    id: 14.12, // ignorando a voz (armadilha) (esquerda)
+    id: 14.1122, // Tentar negociar novamente com sucesso
     imgSrc1: "",
-    imgSrc2: "./imgs/altar.jpg",
-    textLeft: 'Ignorando a voz misteriosa, vocês avançam para o altar, determinados a alcançar seu objetivo. No entanto, à medida que se aproximam, uma armadilha é ativada, aprisionando-os em uma jaula de energia mágica.',
-    textRight: 'Agora, vocês devem encontrar uma maneira de escapar antes que seja tarde demais. Com a mente afiada e a determinação renovada, vocês buscam uma saída enquanto a masmorra se fecha em torno de vocês.',
+    imgSrc2: "./imgs/orc-female.png",
+    textLeft: 'Decidindo tentar uma abordagem mais diplomática, vocês negociam novamente com a sombra, oferecendo-lhe algo que ela deseja em troca de informações ou passagem segura.',
+    textRight: 'Desta vez, a sombra parece mais receptiva e concorda com suas condições. Ela apenas lhes dá permissão para prosseguir.',
     options: [
       {
-        text: 'Buscar uma saída da armadilha',
-        nextText: 14.13
+        text: 'Continuar',
+        nextText: 14.9
       }
     ]
   },
   {
-    id: 14.13, // desafio da armadilha (esquerda)
+    id: 14.1123, // Tentar negociar novamente sem sucesso
     imgSrc1: "",
-    imgSrc2: "",
-    textLeft: 'A armadilha mágica se fecha em torno de vocês, aprisionando-os em uma jaula de energia pulsante. No entanto, ao examinar o ambiente com atenção, vocês notam um padrão nos símbolos que adornam as paredes.',
-    textRight: 'Com astúcia e raciocínio rápido, vocês conseguem decifrar o padrão e desativar a armadilha, ganhando sua liberdade mais uma vez. Agora, o que fazer?',
+    imgSrc2: "./imgs/orc-female.png",
+    textLeft: 'Apesar de seus esforços, a sombra ainda parece hesitante em ceder. Parece que vocês terão que encontrar outra maneira de convencê-la.',
+    textRight: 'Talvez seja hora de considerar outras opções ou buscar ajuda em outro lugar.',
     options: [
       {
-        text: 'Continuar explorando a masmorra',
+        text: 'Lutar contra a sombra',
+        nextText: 14.1121
+      },
+      {
+        text: 'Dar a volta e ignorá-la',
+        nextText: 14.9
+      }
+    ]
+  },
+  {
+    id: 14.12, // desafio do altar ignorando a voz
+    imgSrc1: "",
+    imgSrc2: "./imgs/dark-magit-goblin.png",
+    textLeft: 'Ignorando a voz feminina, vocês avançam para o altar, determinados a alcançar seu objetivo. No entanto, à medida que se aproximam, uma sombra se materializa diante de vocês.',
+    textRight: 'A sombra se transforma em um mago sombrio, oferecendo-lhe riquezas e tesouros inimagináveis em troca de sua lealdade. O que vocês fazem?',
+    options: [
+      {
+        text: 'Tentar enganar a sombra para obter informações',
+        rollTheDice: [14.121, 14.121, 14.122]
+      }
+    ]
+  },
+  {
+    id: 14.121, // Tentar enganar a sombra
+    imgSrc1: "",
+    imgSrc2: "./imgs/dark-magit-goblin.png",
+    textLeft: 'Você tenta enganar a sombra, fazendo-lhe falsas promessas e mentindo sobre suas intenções. No entanto, a sombra parece perceber sua tentativa de manipulação e fica ainda mais desconfiada.',
+    textRight: 'Parece que suas palavras não convenceram a sombra. Vocês precisarão tentar outra abordagem para obter o que desejam.',
+    options: [
+      {
+        text: 'Lutar contra a sombra',
+        nextText: 14.1211
+      },
+      {
+        text: 'Tentar negociar novamente',
+        rollTheDice: [14.1212, 14.1212, 14.1213]
+      }
+    ]
+  },
+  {
+    id: 14.1211, // Lutar contra a sombra
+    imgSrc1: "",
+    imgSrc2: "./imgs/battle.jpg",
+    textLeft: 'Percebendo que a sombra não cederá facilmente, vocês decidem lutar contra ela. A batalha é intensa, com a sombra lançando feitiços sombrios para defendê-la.',
+    textRight: 'Com habilidade e estratégia, vocês conseguem derrotar a sombra, dissipando-a completamente. Agora, vocês estão livres para investigar o altar e prosseguir em sua jornada.',
+    options: [
+      {
+        text: 'Continuar',
+        nextText: 14.9
+      }
+    ]
+  },
+  {
+    id: 14.1212, // Tentar negociar novamente com sucesso
+    imgSrc1: "",
+    imgSrc2: "./imgs/dark-magit-goblin.png",
+    textLeft: 'Decidindo adotar uma abordagem mais diplomática, vocês tentam negociar novamente com a sombra, oferecendo-lhe algo que ela deseja em troca de informações ou passagem segura.',
+    textRight: 'Desta vez, a sombra parece mais receptiva e concorda com suas condições. Ela lhes dá apenas a permissão para prosseguir.',
+    options: [
+      {
+        text: 'Continuar',
+        nextText: 14.9
+      }
+    ]
+  },
+  {
+    id: 14.1213, // Tentar negociar novamente sem sucesso
+    imgSrc1: "",
+    imgSrc2: "./imgs/dark-magit-goblin.png",
+    textLeft: 'Apesar de seus esforços, a sombra ainda parece hesitante em ceder. Parece que vocês terão que encontrar outra maneira de convencê-la.',
+    textRight: 'Talvez seja hora de considerar outras opções ou buscar ajuda em outro lugar.',
+    options: [
+      {
+        text: 'Lutar contra a sombra',
+        nextText: 14.1211
+      },
+      {
+        text: 'Dar a volta e ignorá-la',
         nextText: 14.9
       }
     ]
@@ -1474,6 +2042,18 @@ const textNodes = [
       {
         text: 'Preparar para a batalha contra Tarascona',
         nextText: 15
+      }
+    ]
+  },
+  {
+    id: 15, // Batalha final //  escrever que está em construção e virá em breve
+    imgSrc1: "",
+    imgSrc2: "./imgs/tarasqueStand.jpg",
+    textLeft: 'A batalha final contra Tarascona está prestes a começar. O destino de vocês e do artefato mágico depende do resultado deste confronto épico.',
+    textRight: 'Preparem-se para a batalha final e enfrentem o dragão tartaruga com coragem e determinação. O destino do reino está em suas mãos!',
+    options: [
+      {
+        text: 'Este caminho ainda está em construção',
       }
     ]
   },
