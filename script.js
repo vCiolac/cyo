@@ -27,9 +27,9 @@ function startGame(num) {
 function loadGameState() {
   const savedState = JSON.parse(localStorage.getItem('gameState'));
   const savedPages = localStorage.getItem('gamePage');
-  hpFirstGrandChild.style.width = `${savedState.hp}%` ?? 100 + '%';
-  mpFirstGrandChild.style.width = `${savedState.mp}%`?? 100 + '%';
-  xpFirstGrandChild.style.width = `${savedState.xp}%` ?? 0 + '%';
+  hpFirstGrandChild.style.width = savedState.hp ? `${savedState.hp}%` : 100 + '%';
+  mpFirstGrandChild.style.width = savedState.mp ? `${savedState.mp}%` : 100 + '%';
+  xpFirstGrandChild.style.width = savedState.xp ? `${savedState.xp}%` : 0 + '%';
   if (savedState !== null || savedPages !== null ) {
     state = savedState;
     level.innerHTML = savedState.level ?? 1;
