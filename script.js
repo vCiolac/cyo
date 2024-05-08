@@ -6,6 +6,7 @@ let hp = document.getElementById("hp-bar");
 let mp = document.getElementById("mp-bar");
 let xp = document.getElementById("xp-bar");
 let level = document.getElementById('level');
+let potionSlot = document.getElementById('potion-slot');
 let hpfirstChild = hp.firstChild;
 let mpfirstChild = mp.firstChild;
 let xpfirstChild = xp.firstChild;
@@ -40,8 +41,28 @@ function loadGameState() {
     state = savedState;
     level.innerHTML = savedState.level ?? 1;
     showTextNode(JSON.parse(savedPages));
+    if (state.HpPotion >= 1) {
+      changePotionSlot('on')
+    }
+    else {
+      changePotionSlot('off')
+    }
   } else {
     startGame(1);
+  }
+};
+
+function changePotionSlot(turn) {
+  if (potionSlot) {
+    if (turn === 'off') {
+      potionSlot.classList.add('potion-slot');
+      potionSlot.classList.remove('potion-red');
+    } else if (turn === 'on') {
+      potionSlot.classList.add('potion-red');
+      potionSlot.classList.remove('potion-slot');
+    }
+  } else {
+    console.error('Elemento não encontrado!');
   }
 };
 
@@ -268,19 +289,30 @@ function selectOption(option) {
   } else {
     nextTextNodeId = option.nextText;
   }
+  if (option.useHPPotion) {
+    controllProgress("hp", 'up', 100);
+    playAudio('./mp3/swallow.mp3');
+    changePotionSlot('off');
+  }
+  if (option.getPotion) {
+    changePotionSlot('on')
+  }
   history.push(nextTextNodeId);
   historyState = Object.assign({}, state);
   backButtonClicked = false;
-  if (nextTextNodeId === 5.4 || nextTextNodeId === 13.15 || nextTextNodeId === 13.163 || nextTextNodeId === 13.7 || nextTextNodeId === 13.5) {
-    controlProgress("hp", 'down', 10);
+  if (nextTextNodeId === 5.4 || nextTextNodeId === 13.15
+    || nextTextNodeId === 13.163 || nextTextNodeId === 13.7
+    || nextTextNodeId === 13.5 || nextTextNodeId === 14.164
+    || nextTextNodeId === 14.161 || nextTextNodeId === 14.74) {
+    controllProgress("hp", 'down', 10);
     playAudio('./mp3/hit30.mp3.flac');
   }
-  if (nextTextNodeId === 13.162 || nextTextNodeId === 13.81) {
-    controlProgress("hp", 'down', 5);
+  if (nextTextNodeId === 13.162 || nextTextNodeId === 13.81 || nextTextNodeId === 14.162 || nextTextNodeId === 14.73) {
+    controllProgress("hp", 'down', 5);
     playAudio('./mp3/hit30.mp3.flac');
   }
   if (nextTextNodeId === 5.2 || nextTextNodeId === 5.3) {
-    controlProgress("xp", 'up', 10);
+    controllProgress("xp", 'up', 10);
     playAudio('./mp3/up.wav');
   }
   if (nextTextNodeId === 13.14) {
@@ -289,11 +321,23 @@ function selectOption(option) {
   if (nextTextNodeId === 13.15) {
     playAudio('./mp3/hit30.mp3.flac');
   }
+  if (nextTextNodeId === 14.72) {
+    controllProgress('hp', 'down', 15);
+    playAudio('./mp3/hit30.mp3.flac');
+  }
   if (nextTextNodeId === 12 || nextTextNodeId === 4) {
     playAudio('./mp3/medieval_loop.wav');
   }
   if (nextTextNodeId === 13.91) {
-    controlProgress('xp', 'up', 50);
+    controllProgress('xp', 'up', 30);
+    playAudio('./mp3/up.wav')
+  }
+  if (nextTextNodeId === 14.78) {
+    controllProgress('xp', 'up', 50);
+    playAudio('./mp3/up.wav')
+  }
+  if (nextTextNodeId === 14.166) {
+    controllProgress('xp', 'up', 20);
     playAudio('./mp3/up.wav')
   }
   if (nextTextNodeId <= 0) {
@@ -303,7 +347,7 @@ function selectOption(option) {
   showTextNode(nextTextNodeId);
 };
 
-function controlProgress(name, operador, hit) { // name = "hp" or "mp" or "xp" // oprd = up or down // hit = valorporcentagem
+function controllProgress(name, operador, hit) { // name = "hp" or "mp" or "xp" // oprd = up or down // hit = valorporcentagem
   let progress = document.getElementById(name + "-bar");
   let firstChild = progress.firstChild;
   let firstGrandChild = firstChild.firstChild;
@@ -313,8 +357,14 @@ function controlProgress(name, operador, hit) { // name = "hp" or "mp" or "xp" /
 
   if (operador === 'up') {
     newWidth = currentWidth + hit;
+    if (newWidth >= 100) {
+      newWidth = 100;
+    }
   } else if (operador === 'down') {
     newWidth = currentWidth - hit;
+    if (newWidth <= 0) {
+      newWidth = 0;
+    }
   } else {
     return;
   };
@@ -339,7 +389,7 @@ function dieOrUp(name) {
     let newLvl = currentlvl + 1;
     level.innerHTML = newLvl;
     notification('Sua barra de experiência chegou a 100%! Você upou 1 level!');
-    firstGrandChild.style.width = 0;
+    xpFirstGrandChild.style.width = 0 + '%';
   };
 
 };
@@ -546,7 +596,20 @@ const textNodes = [
       {
         text: 'Ignorar e beber sozinho',
         setState: { skipClargoth: true },
-        nextText: 12
+        nextText: 3.51
+      }
+    ]
+  },
+  {
+    id: 3.51,
+    imgSrc1: "",
+    imgSrc2: "./imgs/clargoth.png",
+    textLeft: 'Você ignora o grupo de aventureiros e continua bebendo sozinho, mas não consegue deixar de ouvir a conversa animada que vem da mesa ao lado.',
+    textRight: 'Clargoth, o líder orc, olha em sua direção com um olhar curioso, mas logo volta a conversar com seus companheiros.',
+    options: [
+      {
+        text: 'Conversar com Clargoth',
+        nextText: 3.2
       }
     ]
   },
@@ -1097,7 +1160,7 @@ const textNodes = [
     imgSrc1: "",
     imgSrc2: "./imgs/door.jpg",
     textLeft: 'Conforme vocês seguem pela trilha, a paisagem se torna cada vez mais íngreme e acidentada. Em certo ponto, vocês se deparam com um grande portão de pedra que bloqueia o caminho. O portão parece antigo e reforçado, e não há nenhuma alavanca ou mecanismo visível para abri-lo.',
-    textRight: 'Clargoth coça a barba, pensativo. "Parece que tem uma aura mágica em torno desse portão que não nós deixa contorna-lo", diz ele, olhando para o portão com desconfiança. "Talvez haja alguma pista que possamos encontrar para abri-lo."',
+    textRight: 'Clargoth coça a barba, pensativo. "Parece que tem uma aura mágica em torno desse portão que não nos deixa contorna-lo", diz ele, olhando para o portão com desconfiança. "Talvez haja alguma pista que possamos encontrar para abri-lo."',
     options: [
       {
         text: 'Avançar',
@@ -1674,7 +1737,7 @@ const textNodes = [
     imgSrc1: "",
     imgSrc2: "",
     textLeft: 'Com o monstro derrotado, vocês recuperam o fôlego e avaliam os danos sofridos durante a batalha. Apesar dos ferimentos e da fadiga, vocês permanecem firmes e determinados a continuar a jornada.',
-    textRight: 'Clargoth se aproxima do grupo, um sorriso de alívio no rosto. "Vocês foram incríveis! Juntos, somos capazes de superar qualquer desafio que a masmorra nos apresentar!". Você ganhou 50 pontos de experiência.',
+    textRight: 'Clargoth se aproxima do grupo, um sorriso de alívio no rosto. "Vocês foram incríveis! Juntos, somos capazes de superar qualquer desafio que a masmorra nos apresentar!". Você ganhou 30 pontos de experiência.',
     options: [
       {
         text: 'Avançar',
@@ -1722,8 +1785,9 @@ const textNodes = [
       },
       {
         text: 'Investigar a porta à direita',
-        nextText: 14.4
-      }
+        nextText: 14.4,
+        requiredState: (currentState) => !currentState.skipMiniBoss,
+      },
     ]
   },
   {
@@ -1745,10 +1809,10 @@ const textNodes = [
   },
   {
     id: 14.4, // direita
-    imgSrc1: "",
-    imgSrc2: "",
-    textLeft: 'A porta range quando é aberta, revelando uma sala empoeirada e esquecida pelo tempo. Pilhas de caixas e barris se acumulam nos cantos, obscurecendo parte do ambiente.',
-    textRight: 'Enquanto vocês examinam o local, um ruído estranho ecoa das sombras. Antes que possam reagir, uma criatura esguia e ágil salta das sombras, pronta para atacar!',
+    imgSrc1: "./imgs/cavePool.png",
+    imgSrc2: "./imgs/miniBossCalm.png",
+    textLeft: "A porta range quando é aberta, uma atmosfera sinistra os envolve. O ambiente é úmido, com um grande lago refletindo a luz fraca que entra pelo teto, estalactites e estalagmites pontuam do teto ao chão. Uma sensação de presságio paira no ar, como se algo estivesse à espreita nas profundezas sombrias.",
+    textRight: 'De repente, de uma das águas escuras, surge um monstro aquático do submundo. Sua forma é uma mescla de sapo e lagarto, com grandes olhos verdes que parecem perfurar sua alma... Ao perceber a presença de seu grupo, o monstro emite um rugido de guerra que ecoa pelas paredes da sala, fechando todas as possíveis saídas.',
     options: [
       {
         text: 'Lutar contra a criatura',
@@ -1756,7 +1820,272 @@ const textNodes = [
       },
       {
         text: 'Fugir pela porta',
-        nextText: 14.8
+        rollTheDice: [14.8, 14.8, 14.81]
+      }
+    ]
+  },
+  {
+    id: 14.7,
+    imgSrc1: "./imgs/miniBossCalm.png",
+    imgSrc2: "./imgs/miniBoss.png",
+    textLeft: 'Com coragem, vocês decidem enfrentar a criatura monstruosa que emerge das profundezas do lago. Armas são sacadas, livros mágicos são abertos, e o grupo se prepara para a batalha. Clargoth diz: "Vamos mostrar a esse monstro o por quê de estarmos aqui!"',
+    textRight: "O monstro começa a se contorcer e se transformar diante de vocês. Espinhos e cabelos verdes irrompem de sua pele, enquanto seus olhos adquirem uma tonalidade psicótica, seus dentes continuam crescendo de tamanho, tornando-se uma ameaça ainda maior.",
+    options: [
+      {
+        text: 'Continuar',
+        nextText: 14.71
+      }
+    ]
+  },
+  {
+    id: 14.71,
+    imgSrc1: "./imgs/miniBoss.png",
+    imgSrc2: "./imgs/miniBossAtk.png",
+    textLeft: "A transformação da criatura continua enquanto ela assume uma forma cada vez mais grotesca. Seu corpo se alonga e se torce, adquirindo uma forma de serpente, enquanto sua pele cria escamas brilhantes e roxas, cobrindo-a em uma armadura natural.",
+    textRight: "Um cristal de poder emerge de sua testa, liberando grandes chifres que se erguem em direção ao teto da caverna. Seu olho verde é tomado por um brilho amarelo sinistro, que parece extinguir qualquer vestígio de humanidade que ainda possa restar na criatura. Pronta para atacar, ela parte para cima de vocês!",
+    options: [
+      {
+        text: 'Atacar com tudo',
+        nextText: 14.72,
+        requiredState: (currentState) => !currentState.hitMiniBoss,
+        setState: { hitMiniBoss: 1 }
+      },
+      {
+        text: 'Defender-se',
+        nextText: 14.73,
+      }
+    ]
+  },
+  {
+    id: 14.72, // atacar com tudo - apanha 15
+    imgSrc1: "",
+    imgSrc2: "./imgs/miniBossAtk.png",
+    textLeft: "Sem hesitar, vocês atacam a criatura com toda a força que têm. No entanto, antes que possam causar qualquer dano significativo, a criatura desvia com tudo, pegando-os de surpresa. Vocês mal conseguem se defender enquanto ela desfere golpes devastadores, causando uma perda significativa de 15 pontos de vida.",
+    textRight: 'Clargoth grita para o grupo: "Rápido, nos defendam! Não podemos deixar que ela nos pegue desprevenidos novamente!"',
+    options: [
+      {
+        text: 'Atacar novamente',
+        nextText: 14.74,
+        requiredState: (currentState) => currentState.hitMiniBoss === 1,
+        setState: { hitMiniBoss: 2 }
+      },
+      {
+        text: 'Defender-se',
+        nextText: 14.73,
+      },
+      {
+        text: 'Gastar um turno para carregar uma magia em grupo',
+        nextText: 14.75,
+        requiredState: (currentState) => !currentState.magicCharged,
+        setState: { magicCharged: true }
+      }
+    ]
+  },
+  {
+    id: 14.73, // defender-se apanha 5
+    imgSrc1: "./imgs/miniBossAtk.png",
+    imgSrc2: "",
+    textLeft: "Agindo rápido, vocês conseguem minimizar o dano sofrido durante o ataque da criatura. Embora ainda sintam o impacto dos golpes, conseguem evitar os piores danos, sofrendo apenas uma perda de 5 pontos de vida.",
+    textRight: 'Clargoth sorri para o grupo e diz: "Bom trabalho, pessoal! Agora é nossa chance de contra-atacar e derrotar essa criatura de uma vez por todas!"',
+    options: [
+      {
+        text: 'Atacar',
+        nextText: 14.74,
+        requiredState: (currentState) => !currentState.hitMiniBoss,
+        setState: { hitMiniBoss: 1 }
+      },
+      {
+        text: 'Atacar',
+        nextText: 14.74,
+        requiredState: (currentState) => currentState.hitMiniBoss === 1,
+        setState: { hitMiniBoss: 2 }
+      },
+      {
+        text: 'Defender-se novamente',
+        nextText: 14.73,
+      },
+      {
+        text: 'Gastar um turno para carregar uma magia em grupo',
+        nextText: 14.75,
+        requiredState: (currentState) => !currentState.magicCharged,
+        setState: { magicCharged: true }
+      }
+    ]
+  },
+  {
+    id: 14.74, // atacar normal, apanha 10
+    imgSrc1: "",
+    imgSrc2: "./imgs/miniBossAtk.png",
+    textLeft: "Apesar dos golpes recebidos, vocês mantêm sua determinação e continuam a lutar contra a criatura. Golpes e feitiços são trocados, enquanto a batalha se intensifica. No entanto, a criatura é rápida e feroz, desferindo golpes poderosos contra vocês.",
+    textRight: 'Clargoth grita para o grupo: "Vamos mostrar a ela do que somos capazes! Não desistam agora!" Ambos os lados estão feridos, você sofre uma perda de 10 pontos de vida.',
+    options: [
+      {
+        text: 'Dar o golpe final',
+        nextText: 14.77,
+        requiredState: (currentState) => currentState.hitMiniBoss === 2,
+        setState: { hitMiniBoss: false }
+      },
+      {
+        text: 'Tentar atacar novamente',
+        nextText: 14.74,
+        requiredState: (currentState) => currentState.hitMiniBoss === 1,
+        setState: { hitMiniBoss: 2 }
+      },
+      {
+        text: 'Defender-se',
+        nextText: 14.73
+      },
+      {
+        text: 'Finalizar a criatura',
+        nextText: 14.755,
+        requiredState: (currentState) => currentState.hitMiniBoss >= 1 && currentState.magicCharged,
+        setState: { magicCharged: false, hitMiniBoss: false }
+      },
+      {
+        text: 'Utilizar a magia em grupo',
+        nextText: 14.76,
+        requiredState: (currentState) => currentState.magicCharged,
+        setState: { magicCharged: false, hitMiniBoss: 2 }
+      },
+      {
+        text: 'Gastar um turno para carregar uma magia em grupo',
+        nextText: 14.75,
+        requiredState: (currentState) => !currentState.magicCharged,
+        setState: { magicCharged: true }
+      }
+    ]
+  },
+  {
+    id: 14.75, // magia em grupo
+    imgSrc1: "",
+    imgSrc2: "./imgs/miniBossAtk.png",
+    textLeft: "Vocês se concentram e canalizam sua energia mágica, preparando um feitiço poderoso para lançar contra a criatura. A magia brilha intensamente, envolvendo o grupo em uma aura de poder e proteção.",
+    textRight: 'A criatura recua momentaneamente, surpresa pela intensidade da magia que vocês conjuraram. É hora de aproveitar a vantagem e pressionar o ataque contra o monstro.',
+    options: [
+      {
+        text: 'Finalizar a criatura',
+        nextText: 14.755,
+        requiredState: (currentState) => currentState.hitMiniBoss >= 1 && currentState.magicCharged,
+        setState: { magicCharged: false, hitMiniBoss: false }
+      },
+      {
+        text: 'Utilizar a magia em grupo',
+        nextText: 14.76,
+        requiredState: (currentState) => currentState.magicCharged,
+        setState: { magicCharged: false, hitMiniBoss: 2 }
+      },
+      {
+        text: 'Atacar',
+        nextText: 14.74,
+        requiredState: (currentState) => currentState.hitMiniBoss === 1,
+        setState: { hitMiniBoss: 2 }
+      },
+      {
+        text: 'Dar o golpe final',
+        nextText: 14.77,
+        requiredState: (currentState) => currentState.hitMiniBoss === 2,
+        setState: { hitMiniBoss: false }
+      },
+      {
+        text: 'Defender-se',
+        nextText: 14.73
+      }
+    ]
+  },
+  {
+    id: 14.76, // magia em grupo sem bater na criatura antes
+    imgSrc1: "",
+    imgSrc2: "./imgs/miniBossAtk.png",
+    textLeft: "",
+    textRight: '',
+    options: [
+      {
+        text: 'Dar o golpe final',
+        nextText: 14.77,
+        requiredState: (currentState) => currentState.hitMiniBoss === 2,
+        setState: { hitMiniBoss: false }
+      },
+      {
+        text: 'Defender-se',
+        nextText: 14.73
+      }
+    ]
+  },
+  {
+    id: 14.755, // finalizar a criatura ferida com sua magia em grupo
+    imgSrc1: "./imgs/miniBossAtk.png",
+    imgSrc2: "./imgs/cavePool.png",
+    textLeft: "Com um golpe certeiro e o poder da magia conjurada em grupo, vocês conseguem atingir o ponto fraco da criatura, o cristal em sua cabeça. O cristal se parte em estilhaços, fazendo com que a criatura comece a se contorcer e agonizar de dor.",
+    textRight: "Arrastando-se em direção à lagoa, a criatura desaparece nas águas escuras. Logo em seguida uma luz branca intensa emana da superfície do lago, envolvendo a criatura. Quando a luz se dissipa, ela começa a recuperar sua forma original",
+    options: [
+      {
+        text: 'Prosseguir',
+        nextText: 14.78,
+        setState: { HpPotion: 1 },
+        getPotion: true
+      }
+    ]
+  },
+  {
+    id: 14.77,
+    imgSrc1: "./imgs/miniBossAtk.png",
+    imgSrc2: "./imgs/cavePool.png",
+    textLeft: "Com uma série de golpes precisos, vocês conseguem atacar o ponto fraco da criatura, o cristal em sua cabeça. Com um esforço conjunto, o cristal se parte em estilhaços, fazendo com que a criatura comece a se contorcer e agonizar de dor.",
+    textRight: "Arrastando-se em direção à lagoa, a criatura desaparece nas águas escuras. Logo em seguida uma luz branca intensa emana da superfície do lago, envolvendo a criatura. Quando a luz se dissipa, ela começa a recuperar sua forma original.",
+    options: [
+      {
+        text: 'Prosseguir',
+        nextText: 14.78,
+        setState: { HpPotion: 1 },
+        getPotion: true
+      }
+    ]
+  },
+  {
+    id: 14.78,
+    imgSrc1: "",
+    imgSrc2: "./imgs/miniBossCalm.png",
+    textLeft: "A criatura, agora em sua forma original, emerge das águas do lago. Seus olhos verdes brilham com gratidão e alívio, enquanto ela caminha em direção ao grupo com cautela, ela se ajoelha diante de vocês, agradecendo por terem libertado sua alma da corrupção do cristal. ",
+    textRight: "Ela se aproxima ainda mais do grupo, e os recompensa com uma poção de cura e 50 pontos de experiência.",
+    options: [
+      {
+        text: 'Agradecer e continuar',
+        nextText: 14.9,
+      }
+    ]
+  },
+  {
+    id: 14.8,
+    imgSrc1: "./imgs/miniBossCalm.png",
+    imgSrc2: "./imgs/miniBoss.png",
+    textLeft: "Percebendo que a batalha seria uma luta desesperada pela sobrevivência, vocês optam por buscar uma rota de fuga. Correm desesperadamente em direção à porta pela qual entraram, esperando encontrar uma saída para a ameaça que os persegue. No entanto, para a frustração do grupo, a porta continua trancada e não cede aos seus esforços.",
+    textRight: "Enquanto vocês tentam desesperadamente abrir a porta trancada, a criatura monstruosa continua sua transformação, espinhos e cabelos verdes irrompem de sua pele, enquanto seus olhos adquirem uma tonalidade psicótica. A esperança de uma fuga fácil desaparece rapidamente, e vocês percebem que não terão escolha senão enfrentar a criatura de frente.",
+    options: [
+      {
+        text: 'Continuar',
+        nextText: 14.71
+      }
+    ]
+  },
+  {
+    id: 14.81,
+    imgSrc1: "./imgs/cavePool.png",
+    imgSrc2: "./imgs/miniBossCalm.png",
+    textLeft: "Desesperados para encontrar uma saída, vocês correm em direção à porta na esperança de escapar da criatura monstruosa que os persegue. Para a surpresa e alívio do grupo, a porta está destrancada e se abre facilmente, permitindo que vocês escapem a tempo.",
+    textRight: "Enquanto vocês fogem pela porta, a criatura continua atrás de vocês. Vocês podem sentir a presença sinistra da criatura se fortalecendo enquanto se afastam, mas pelo menos conseguiram evitar um confronto imediato.",
+    options: [
+      {
+        text: 'Retornar e enfrentar a criatura',
+        nextText: 14.7
+      },
+      {
+        text: 'Voltar e tentar pegar outra rota',
+        nextText: 14.2,
+        setState: { skipMiniBoss: true }
+      },
+      {
+        text: 'Continuar explorando em frente',
+        nextText: 14.9
       }
     ]
   },
@@ -1910,7 +2239,7 @@ const textNodes = [
     textRight: 'Ela não parece estar trancada, diz Clargoth. Vocês conseguem abrir a porta, revelando um vasto salão com pilares de pedra e novamente um altar no centro. Mas dessa vez, parece ser um altar diferente... Antes que possam avançar, uma voz feminina ecoa pelo salão, chamando-os para o centro...',
     options: [
       {
-        text: 'Aceitar o desafio',
+        text: 'Seguir a voz',
         nextText: 14.11
       },
       {
@@ -1920,40 +2249,10 @@ const textNodes = [
     ]
   },
   {
-    id: 14.7, // direita, lutar com mini-boss
-    imgSrc1: "",
-    imgSrc2: "",
-    textLeft: 'A criatura ataca com ferocidade, seus olhos brilhando com fúria. Uma batalha feroz se desenrola, com vocês lutando pela vida contra o monstro das sombras.',
-    textRight: 'Apesar dos ferimentos, vocês emergem vitoriosos da batalha. Com a criatura derrotada, vocês continuam sua jornada pela masmorra, prontos para enfrentar o que quer que venha a seguir.',
-    options: [
-      {
-        text: 'Continuar explorando a masmorra',
-        nextText: 14.9
-      }
-    ]
-  },
-  {
-    id: 14.8, // direita sem mini-boss
-    imgSrc1: "",
-    imgSrc2: "",
-    textLeft: 'Sem hesitar, vocês fogem pela porta, deixando a criatura furiosa para trás. Correndo pelo corredor escuro, vocês conseguem escapar por pouco, mas o encontro com o monstro deixa uma sensação de perigo iminente no ar.',
-    textRight: 'Depois de alguns minutos de corrida frenética, vocês param para recuperar o fôlego. Agora, o que fazer?',
-    options: [
-      {
-        text: 'Retornar e enfrentar a criatura',
-        nextText: 14.7
-      },
-      {
-        text: 'Continuar explorando a masmorra',
-        nextText: 14.9
-      }
-    ]
-  },
-  {
     id: 14.11, // desafio do altar com a voz
     imgSrc1: "",
     imgSrc2: "./imgs/orc-female.png",
-    textLeft: 'Aceitando o desafio vocês caminham em direção ao altar, no entanto, à medida que se aproximam, uma sombra se materializa diante de vocês, assumindo a forma do seu maior desejo.',
+    textLeft: 'Encantados pela profundez de sua voz, vocês caminham em direção ao centro da sala, no entanto, à medida que se aproximam, uma sombra se materializa diante de vocês, assumindo a forma do seu maior desejo.',
     textRight: 'Para Clargoth, a sombra se transforma em uma orc guerreira sedutora, prometendo-lhe poder e glória em troca de sua lealdade. O que vocês fazem?',
     options: [
       {
@@ -1975,20 +2274,7 @@ const textNodes = [
       },
       {
         text: 'Tentar negociar novamente',
-        rollTheDice: [14.1122, 14.1122, 14.1123]
-      }
-    ]
-  },
-  {
-    id: 14.1121, // Lutar contra a sombra
-    imgSrc1: "",
-    imgSrc2: "./imgs/battle.jpg",
-    textLeft: 'Diante da recusa da sombra em ceder, vocês decidem lutar contra ela. A batalha é feroz e intensa, com a sombra usando magia sombria para atacá-los.',
-    textRight: 'Com habilidade e determinação, vocês conseguem derrotar a sombra, dissipando-a completamente. Agora, vocês estão livres para investigar o altar e prosseguir em sua jornada.',
-    options: [
-      {
-        text: 'Continuar',
-        nextText: 14.9
+        rollTheDice: [14.1122, 14.1123, 14.1123]
       }
     ]
   },
@@ -2044,24 +2330,11 @@ const textNodes = [
     options: [
       {
         text: 'Lutar contra a sombra',
-        nextText: 14.1211
+        nextText: 14.1121
       },
       {
         text: 'Tentar negociar novamente',
         rollTheDice: [14.1212, 14.1212, 14.1213]
-      }
-    ]
-  },
-  {
-    id: 14.1211, // Lutar contra a sombra
-    imgSrc1: "",
-    imgSrc2: "./imgs/battle.jpg",
-    textLeft: 'Percebendo que a sombra não cederá facilmente, vocês decidem lutar contra ela. A batalha é intensa, com a sombra lançando feitiços sombrios para defendê-la.',
-    textRight: 'Com habilidade e estratégia, vocês conseguem derrotar a sombra, dissipando-a completamente. Agora, vocês estão livres para investigar o altar e prosseguir em sua jornada.',
-    options: [
-      {
-        text: 'Continuar',
-        nextText: 14.9
       }
     ]
   },
@@ -2087,7 +2360,7 @@ const textNodes = [
     options: [
       {
         text: 'Lutar contra a sombra',
-        nextText: 14.1211
+        nextText: 14.1121
       },
       {
         text: 'Dar a volta e ignorá-la',
@@ -2096,20 +2369,157 @@ const textNodes = [
     ]
   },
   {
-    id: 14.9, // Final de todos os caminhos
-    imgSrc1: "",
-    imgSrc2: "./imgs/tarasconaDoor.png",
-    textLeft: 'Ainda há muito a explorar na masmorra, e cada passo traz novos desafios e perigos. Com determinação, vocês avançam mais fundo nas profundezas, preparados para enfrentar o que quer que o destino lhes reserve.',
-    textRight: 'Depois de horas de exploração, vocês finalmente encontram o que procuravam: a lendária Tarascona, um dragão tartaruga com escamas reluzentes e olhos penetrantes. O confronto final está prestes a começar!',
+    id: 14.1121, // Lutar contra a sombra
+    imgSrc1: "./imgs/shadow.jpg",
+    imgSrc2: "./imgs/shadowMonster.jpg",
+    textLeft: 'A sombra percebe a sede de sangue em seus olhos, sua intenção de lutar, e rapidamente se afasta, receitando com uma voz baixa e grave, ela começa a absorver a energia mágica ao seu redor. Em um piscar de olhos, a sombra se transforma em uma fera endemoniada, com uma forma distorcida ela irradia uma aura sinistra.',
+    textRight: 'Vocẽs precisam agir rápido, a fera se aproxima com garras afiadas e seus olhos brilhando com uma luz sombria. O que vocês fazem?',
     options: [
       {
-        text: 'Preparar para a batalha contra Tarascona',
-        nextText: 15
+        text: 'Atacar a sombra',
+        rollTheDice: [14.1612, 14.161, 14.161]
+      },
+      {
+        text: 'Recuar e preparar uma estratégia',
+        nextText: 14.162
       }
     ]
   },
   {
-    id: 15, // Batalha final //  escrever que está em construção e virá em breve
+    id: 14.161, // Atacar a sombra
+    imgSrc1: "",
+    imgSrc2: "./imgs/shadowMonster.jpg",
+    textLeft: 'Vocês decidem em não hesitar diante da ameaça e avançar para o ataque. Com as armas na mão, você e seus companheiros investem contra a fera endemoniada, determinados a derrotá-la e proteger uns aos outros.',
+    textRight: 'A fera, por sua vez, responde com ferocidade, suas garras afiadas desferindo golpes poderosos contra vocês. A batalha é feroz e intensa, com cada lado lutando com todas as suas forças pela supremacia. Você perde 10 pontos de vida',
+    options: [
+      {
+        text: 'Continuar lutando',
+        nextText: 14.163,
+        setState: { hitShadowMonster: 1 }
+      }
+    ]
+  },
+  {
+    id: 14.1612, // Atacar a sombra e ela desvia
+    imgSrc1: "",
+    imgSrc2: "./imgs/shadowMonster.jpg",
+    textLeft: 'Vocês decidem não hesitar diante da ameaça e avançar para o ataque. Cada membro do grupo empunha suas armas com determinação, prontos para enfrentar a fera endemoniada. Entretanto, no calor da batalha, um dos membros do grupo se atrapalha, perdendo momentaneamente o equilíbrio e desviando seu golpe. A fera, aproveitando-se dessa brecha, se esquiva habilmente do ataque, demonstrando uma agilidade surpreendente.',
+    textRight: 'A batalha continua, mas agora vocês precisam redobrar a atenção e a coordenação para enfrentar a fera, pois ela mostrou que não será uma oponente fácil de derrotar.',
+    options: [
+      {
+        text: 'Continuar lutando',
+        nextText: 14.163,
+      }
+    ]
+  },
+  {
+    id: 14.162, // Recuar e preparar uma estratégia
+    imgSrc1: "",
+    imgSrc2: "./imgs/shadowMonster.jpg",
+    textLeft: 'Vocês decidem que é melhor recuar e preparar uma estratégia para lidar com a fera endemoniada. Vocês se afastam lentamente, mantendo os olhos fixos na sombra enquanto conseguem discutir um plano de ação.',
+    textRight: 'Enquanto recuam, a fera endemoniada avança com uma fúria implacável, determinada a não deixar nenhum de vocês escapar, suas garras afiadas acertam alguns de seus companheiros, graças ao movimento rápido, ninguém é ferido gravemente. Você perde 5 pontos de vida',
+    options: [
+      {
+        text: 'Continuar lutando',
+        nextText: 14.163,
+        setState: { strategy: true }
+      }
+    ]
+  },
+  {
+    id: 14.163,
+    imgSrc1: "",
+    imgSrc2: "./imgs/shadowMonster.jpg",
+    textLeft: 'A batalha contra a fera endemoniada continua, com ambos os lados trocando golpes brutais e investidas ousadas. Vocês lutam com todas as suas forças.',
+    textRight: 'Seu esforço conjunto começa a dar frutos, com a fera mostrando sinais de fadiga após sofrer uma série de golpes poderosos. É hora de pressionar o ataque e acabar com essa ameaça de uma vez por todas.',
+    options: [
+      {
+        text: 'Atacar',
+        nextText: 14.164,
+        requiredState: (currentState) => !currentState.hitShadowMonster,
+        setState: { hitShadowMonster: 1 }
+      },
+      {
+        text: 'Atacar novamente',
+        nextText: 14.166,
+        requiredState: (currentState) => currentState.hitShadowMonster <= 1,
+        setState: { hitShadowMonster: false }
+      },
+      {
+        text: 'Usar a estratégia preparada',
+        nextText: 14.165,
+        requiredState: (currentState) => currentState.strategy,
+        setState: { strategy: false }
+      }
+    ]
+  },
+  {
+    id: 14.164, // Fera contra-ataca
+    imgSrc1: "",
+    imgSrc2: "./imgs/shadowMonster.jpg",
+    textLeft: 'Você e seus companheiros continuam a investir contra a fera endemoniada, determinados a derrotá-la de uma vez por todas. No entanto, em um movimento surpreendente, a fera contra-ataca com uma investida poderosa, desferindo golpes devastadores contra vocês.',
+    textRight: 'O golpe da fera é rápido e brutal, pegando vocês desprevenidos. Você perde 10 pontos de vida. Agora você está em uma encruzilhada, o que você faz?',
+    options: [
+      {
+        text: 'Continuar lutando',
+        nextText: 14.163,
+      },
+      {
+        text: 'Recuar e preparar uma estratégia',
+        nextText: 14.162,
+        requiredState: (currentState) => !currentState.strategy
+      }
+    ]
+  },
+  {
+    id: 14.165, // Usar a estratégia preparada
+    imgSrc1: "",
+    imgSrc2: "./imgs/shadowMonster.jpg",
+    textLeft: 'Lembrando da estratégia preparada anteriormente, você e seus companheiros começam a executar o plano com precisão e coordenação. Cada movimento é calculado, visando explorar as fraquezas da fera e maximizar os pontos fortes do grupo.',
+    textRight: 'A fera se vê encurralada pela astúcia e determinação do grupo, incapaz de lidar com a estratégia elaborada contra ela. Com cada movimento calculado, vocês ganham vantagem na batalha, aproximando-se cada vez mais da vitória.',
+    options: [
+      {
+        text: 'Continuar a execução da estratégia',
+        nextText: 14.166,
+      }
+    ]
+  },
+  {
+    id: 14.166,
+    imgSrc1: "",
+    imgSrc2: "./imgs/shadow.jpg",
+    textLeft: 'Com uma última investida, você e seus companheiros conseguem enfraquecer a sombra o suficiente para derrubá-la. Sua forma endemoniada treme e se desfaz lentamente, a magia que a compõe se dissipa pelo ar, ela grita de dor enquanto seus olhos perdem o brilho sombrio e suas garras se enfraquecem...',
+    textRight: 'Em poucos momentos, ela se transforma em uma silhueta espectral que se dissolve nas sombras da masmorra. O perigo foi eliminado, mas a presença das sombras permanece perto de você. Você ganhou 20 pontos de experiência pela vitória.',
+    options: [
+      {
+        text: 'Avançar',
+        nextText: 14.9,
+        setState: { shadowBless: true }
+      }
+    ]
+  },
+  {
+    id: 14.9, // Final de todos os caminhos
+    imgSrc1: "",
+    imgSrc2: "./imgs/tarasconaDoor.png",
+    textLeft: 'Enquanto avançam mais ainda pelas sombras da masmorra, vocês sentem a adrenalina pulsar em suas veias. Cada passo traz a promessa de novas descobertas e desafios. Clargoth, com olhos brilhantes de excitação, exclama: "Estamos cada vez mais perto da Tarascona! A batalha promete ser épica, meus amigos!"',
+    textRight: 'Ao chegar à entrada da lendária Tarascona, a porta maciça se destaca diante de vocês. Antes mesmo que possam reagir, um rugido ensurdecedor ecoa dos recessos do corredor e a própria Tarascona emerge das sombras, pronta para atacar pra cima de vocês com fúria!',
+    options: [
+      {
+        text: 'Iniciar a batalha contra Tarascona',
+        nextText: 15
+      },
+      {
+        text: 'Usar a poção de cura',
+        useHPPotion: true,
+        nextText: 15,
+        requiredState: (currentState) => currentState.HpPotion >= 1,
+        setState: { HpPotion: false }
+      }
+    ]
+  },
+  {
+    id: 15, // Batalha final
     imgSrc1: "",
     imgSrc2: "./imgs/tarasqueStand.jpg",
     textLeft: 'A batalha final contra Tarascona está prestes a começar. O destino de vocês e do artefato mágico depende do resultado deste confronto épico.',
@@ -2117,6 +2527,19 @@ const textNodes = [
     options: [
       {
         text: 'Este caminho ainda está em construção',
+        nextText: 15.1,
+      }
+    ]
+  },
+  {
+    id: 15.1,
+    imgSrc1: "",
+    imgSrc2: "./imgs/tarasque.jpg",
+    textLeft: 'Parabéns e obrigado por ter jogado até aqui, no momento esta batalha ainda não está pronta, ela está em construção para ser uma batalha final épica. Espero que tenha gostado da aventura e que tenha se divertido. Até breve!',
+    textRight: 'O jogo utiliza um armazenamento temporário para salvar o progresso, então você pode continuar de onde parou na próxima vez que jogar. Se tiver alguma sugestão ou feedback, por favor, me avise. Obrigado!',
+    options: [
+      {
+        text: 'Em breve',
       }
     ]
   },
