@@ -32,11 +32,11 @@ function loadGameState() {
     mpFirstGrandChild.style.width = savedState.mp ? `${savedState.mp}%` : 100 + '%';
     xpFirstGrandChild.style.width = savedState.xp ? `${savedState.xp}%` : 0 + '%';
   } else {
-     hpFirstGrandChild.style.width = 100 + '%';
-     mpFirstGrandChild.style.width = 100 + '%';
-     xpFirstGrandChild.style.width = 0 + '%';
+    hpFirstGrandChild.style.width = 100 + '%';
+    mpFirstGrandChild.style.width = 100 + '%';
+    xpFirstGrandChild.style.width = 0 + '%';
   }
-  if (savedState !== null || savedPages !== null ) {
+  if (savedState !== null || savedPages !== null) {
     state = savedState;
     level.innerHTML = savedState.level ?? 1;
     showTextNode(JSON.parse(savedPages));
@@ -46,8 +46,10 @@ function loadGameState() {
 };
 
 function restart() {
-  localStorage.clear();
   history = [];
+  state = {};
+  historyState = {};
+  localStorage.clear();
   startGame(1);
 };
 
@@ -85,7 +87,7 @@ function playPauseButton() {
 
 function playBackgroundMusic() {
   if (isBackgroundMusicPlaying) {
-    backgroundMusic.volume = 0.9; // 1 = 100%
+    backgroundMusic.volume = 0.7; // 1 = 100%
     backgroundMusic.play();
     isBackgroundMusicPlaying = true;
     backgroundMusic.addEventListener('ended', function () {
@@ -190,6 +192,10 @@ function saveGameState(textNodeIndex) {
 };
 
 function showTextNode(textNodeIndex) {
+  if (state.hp && state.hp <= 0) {
+    notification('Sua barra de vida chegou a 0%, você morreu.');
+    return restart();
+  }
   const textNode = textNodes.find(textNode => textNode.id === textNodeIndex);
   isFinished.value = false;
   typeWriter(`${textNode.textLeft}`, textLeftElement, `${textNode.textRight}`, textRightElement);
@@ -233,7 +239,12 @@ function showTextNode(textNodeIndex) {
 
       button.addEventListener('click', () => {
         if (isFinished.value) {
-          selectOption(option);
+          if (state.hp && state.hp <= 0) {
+            notification('Sua barra de vida chegou a 0%, você morreu.');
+            return restart();
+          } else {
+            selectOption(option);
+          }
         } else {
           notification('Por favor espere o texto terminar de ser escrito antes de fazer uma escolha.');
           writeSpeed = 0;
@@ -264,8 +275,8 @@ function selectOption(option) {
     controlProgress("hp", 'down', 10);
     playAudio('./mp3/hit30.mp3.flac');
   }
-  if (nextTextNodeId === 13.162 || nextTextNodeId === 13.6 || nextTextNodeId === 13.8) {
-    controlProgress("mp", 'down', 5);
+  if (nextTextNodeId === 13.162 || nextTextNodeId === 13.81) {
+    controlProgress("hp", 'down', 5);
     playAudio('./mp3/hit30.mp3.flac');
   }
   if (nextTextNodeId === 5.2 || nextTextNodeId === 5.3) {
@@ -320,7 +331,7 @@ function dieOrUp(name) {
   let level = document.getElementById('level');
   if (name === 'hp' && parseInt(firstGrandChild.style.width) <= 0) {
     notification('Sua barra de vida chegou a 0%, você morreu.');
-    restart();
+    return restart();
   };
   if (name === 'xp' && parseInt(firstGrandChild.style.width) >= 100) {
     state.level += 1;
@@ -1429,7 +1440,7 @@ const textNodes = [
         nextText: 14
       }
     ]
-  },  
+  },
   {
     id: 13.3, // Caminho do Deserto
     imgSrc1: "",
@@ -1515,7 +1526,7 @@ const textNodes = [
   },
   {
     id: 13.33, // luta
-    imgSrc1: "",
+    imgSrc1: "./imgs/desert3.jpg",
     imgSrc2: "./imgs/desertMonster.jpg",
     textLeft: 'Após atravessarem a passagem com sucesso, vocês continuam a jornada pelo deserto, adentrando cada vez mais nas profundezas da vastidão árida. A atmosfera ao redor parece carregada de mistério e perigo, aumentando a tensão entre o grupo.',
     textRight: 'Quando menos esperam, um rugido ecoa pelas dunas de areia, seguido por um tremor no solo. Diante de vocês, emerge uma criatura colossal, com um corpo humanoide, sua aura pulsa uma magia antiga e uma fome primordial, diante de vocês, pronta para se saciar!',
@@ -1535,7 +1546,8 @@ const textNodes = [
     options: [
       {
         text: 'Atacar',
-        nextText: 13.5
+        nextText: 13.5,
+        setState: { hitDesertMonster: 1 }
       },
       {
         text: 'Defender',
@@ -1548,11 +1560,11 @@ const textNodes = [
     ]
   },
   {
-    id: 13.5,
+    id: 13.5, // atk
     imgSrc1: "",
     imgSrc2: "./imgs/desertMonsterBattle.jpg",
     textLeft: 'Você decide atacar, lançando-se contra o monstro com bravura e determinação. Seus golpes encontram seu alvo, causando dano significativo ao adversário, mas não sem sofrer ferimentos em troca.',
-    textRight: 'O monstro retalha com suas garras afiadas, desferindo golpes poderosos contra você e seus companheiros. O confronto é intenso e implacável, cada lado lutando ferozmente pela supremacia. Você perde 5 pontos de vida',
+    textRight: 'O monstro retalha com suas garras afiadas, desferindo golpes poderosos contra você e seus companheiros. O confronto é intenso e implacável, cada lado lutando ferozmente pela supremacia. Você perde 10 pontos de vida',
     options: [
       {
         text: 'Continuar lutando',
@@ -1561,7 +1573,7 @@ const textNodes = [
     ]
   },
   {
-    id: 13.6,
+    id: 13.6, // defende
     imgSrc1: "",
     imgSrc2: "./imgs/desertMonsterBattle.jpg",
     textLeft: 'Você opta por adotar uma postura defensiva, preparando-se para resistir aos ataques do monstro. Sua estratégia mostra-se eficaz, permitindo-lhe mitigar parte do dano infligido pelo inimigo.',
@@ -1574,7 +1586,7 @@ const textNodes = [
     ]
   },
   {
-    id: 13.7,
+    id: 13.7, // recuar
     imgSrc1: "",
     imgSrc2: "./imgs/desertMonsterBattle.jpg",
     textLeft: 'Você tenta recuar para uma posição mais segura, mas o monstro bloqueia seu caminho, determinado a não deixar nenhum de vocês escapar. Suas garras afiadas brilham perigosamente, prontas para desferir golpes mortais.',
@@ -1587,31 +1599,76 @@ const textNodes = [
     ]
   },
   {
-    id: 13.8,
+    id: 13.8, // luta continua
     imgSrc1: "",
-    imgSrc2: "./imgs/desertMonsterBattle.jpg",
+    imgSrc2: "./imgs/desertMonster.jpg",
     textLeft: 'A batalha se intensifica, com ambos os lados trocando golpes brutais e investidas ousadas. Vocês lutam com todas as suas forças, determinados a derrotar o monstro e proteger uns aos outros.',
     textRight: 'Seu esforço conjunto começa a dar frutos, com o monstro mostrando sinais de fadiga após sofrer uma série de golpes poderosos. É hora de pressionar o ataque e acabar com essa ameaça de uma vez por todas.',
     options: [
       {
-        text: 'Atacar novamente',
-        nextText: 13.9
+        text: 'Atacar',
+        nextText: 13.81,
+        requiredState: (currentState) => !currentState.hitDesertMonster,
+        setState: { hitDesertMonster: 1 }
+      },
+      {
+        text: 'Atacar',
+        nextText: 13.81,
+        requiredState: (currentState) => currentState.hitDesertMonster <= 2,
+        setState: { hitDesertMonster: 2 }
+      },
+      {
+        text: 'Defender',
+        nextText: 13.82,
+      }
+    ]
+  },
+  {
+    id: 13.81, // atk
+    imgSrc1: "",
+    imgSrc2: "./imgs/desertMonsterBattle.jpg",
+    textLeft: 'Você avança com coragem, concentrando seus ataques no monstro fatigado. Seus golpes encontram seu alvo com precisão, causando danos significativos ao adversário.',
+    textRight: 'O monstro solta um rugido de dor, seu corpo cambaleando sob o impacto dos seus ataques. Vocês estão perto de derrotar a criatura, unidos pela coragem e pela determinação de enfrentar o perigo juntos. Você perde 5 pontos de vida',
+    options: [
+      {
+        text: 'Dar o golpe final',
+        nextText: 13.9,
+        requiredState: (currentState) => currentState.hitDesertMonster >= 2,
+        setState: { hitDesertMonster: false }
+      },
+      {
+        text: 'Continuar atacando',
+        nextText: 13.8,
+        requiredState: (currentState) => currentState.hitDesertMonster < 2,
+      }
+    ]
+  },
+  {
+    id: 13.82, // def
+    imgSrc1: "./imgs/desertMonster.jpg",
+    imgSrc2: "./imgs/desertMonsterBattle.jpg",
+    textLeft: 'Você decide adotar uma postura defensiva, preparando-se para resistir aos ataques do monstro. No entanto, ele aproveita a oportunidade para recuperar o fôlego.',
+    textRight: 'O monstro então emite um rugido desafiador, sua ferocidade renovada pela pausa na batalha. Vocês precisam agir com rapidez e determinação para superar essa ameaça.',
+    options: [
+      {
+        text: 'Continuar lutando',
+        nextText: 13.8
       }
     ]
   },
   {
     id: 13.9,
-    imgSrc1: "",
-    imgSrc2: "./imgs/desertMonster.jpg",
+    imgSrc1: "./imgs/desertMonster.jpg",
+    imgSrc2: "./imgs/desertMonsterBattle.jpg",
     textLeft: 'Com determinação renovada, vocês avançam com uma ferocidade renovada, concentrando seus ataques no monstro fatigado. Seus esforços conjuntos finalmente rendem frutos, e o monstro cai, derrotado, diante de vocês.',
     textRight: 'A criatura solta um rugido final, seu corpo desmoronando no chão da areia. Vocês triunfaram sobre o desafio, unidos pela coragem e pela determinação de enfrentar o perigo juntos.',
     options: [
       {
         text: 'Continuar',
-        nextText: 13.91
+        nextText: 13.91,
       }
     ]
-  },  
+  },
   {
     id: 13.91,
     imgSrc1: "",
