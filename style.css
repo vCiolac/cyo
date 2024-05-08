@@ -162,16 +162,17 @@ header {
 }
 
 .close-button {
-  position: absolute;
-  top: 0;
-  right: 0;
   background-color: transparent;
-  color: #fff;
   border: none;
-  font-size: 3rem;
+  color: #fff;
   cursor: pointer;
+  font-size: 3rem;
+  margin-right: 3rem;
   outline: none;
   padding: 0.5rem;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .popup {
@@ -218,6 +219,11 @@ header {
   .pageLeft {
     width: 100%;
   }
+
+  .close-button {
+    margin-right: 1rem;
+    margin-top: 5rem;
+  } 
 
   #bars {
     flex-direction: column;
