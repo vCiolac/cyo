@@ -244,6 +244,10 @@ header {
     align-self: stretch;
   }
 
+  #pageControls {
+    display: ruby-text;
+  }
+
   .playPause {
     top: -4.21em;
     right: -4.1em;
