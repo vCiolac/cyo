@@ -636,7 +636,7 @@ const textNodes = [
     id: 3.2,
     imgSrc1: "",
     imgSrc2: "./imgs/clargoth.png",
-    textLeft: '"Ei, meu amigo. Algum problema? Meu grupo precisa se preparar para a jornada que virá em breve.", diz Clargoth, sorrindo de forma amistosa',
+    textLeft: '"Ei, meu amigo. Algum problema? Meu grupo precisa se preparar para a jornada que virá em breve.", diz Clargoth, sorrindo de forma amistosa.',
     textRight: 'Clargoth é um líder Orc, leal e forte, que sempre terá o interesse de seus amigos em primeiro lugar.',
     options: [
       {
@@ -650,7 +650,7 @@ const textNodes = [
         nextText: 3.1
       },
       {
-        text: 'Nada não.',
+        text: 'Nada não',
         setState: { skipClargoth: true },
         nextText: 12
       }
@@ -713,7 +713,7 @@ const textNodes = [
         nextText: 5.2
       },
       {
-        text: 'Usar um feitiço de congelamento, pode retardar seus movimentos tornando-o mais fácil de acertar.',
+        text: 'Usar um feitiço de congelamento, pode retardar seus movimentos tornando-o mais fácil de acertar',
         nextText: 5.2
       }
     ]
@@ -727,7 +727,7 @@ const textNodes = [
     textRight: `"Os dragões são extremamente inteligentes e podem antecipar nossos movimentos. Precisamos pensar em algo que possa enganá-lo, algo que ele não espera."`,
     options: [
       {
-        text: 'Usar uma arma mágica que cause danos adicionais a criaturas mágicas.',
+        text: 'Usar uma arma mágica que cause danos adicionais a criaturas mágicas',
         nextText: 5.3
       },
       {
