@@ -2,7 +2,7 @@
 
 Meu primeiro projeto de jogo! Este jogo de aventura por texto foi desenvolvido exclusivamente em JavaScript, utilizando o DOM para interação com o usuário. Os jogadores têm a oportunidade de tomar decisões que influenciam diretamente o rumo da história.
 
-[Experimente aqui](https://vciolac.github.io/cyo/)
+[Experimente aqui](https://cyo.vercel.app)
 
 ## Funcionalidades Principais:
 
