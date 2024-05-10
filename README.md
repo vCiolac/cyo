@@ -4,6 +4,9 @@ Meu primeiro projeto de jogo! Este jogo de aventura por texto foi desenvolvido e
 
 [Experimente aqui](https://cyo.vercel.app)
 
+![Visualização em telas grandes](https://media.licdn.com/dms/image/D4E22AQGbyndmDezn9g/feedshare-shrink_800/0/1715209747694?e=1718236800&v=beta&t=MEwmbrCCj7Wk41UxzQsSDDA56i3Y80zq0ylHKpZwEjk)
+
+
 ## Funcionalidades Principais:
 
 - **Sistema de Progresso do Personagem:** Implementação de um sistema abrangente de progresso, incluindo vida, mana, experiência e progressão do personagem ao longo do jogo.
