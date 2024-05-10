@@ -19,3 +19,11 @@ Meu primeiro projeto de jogo! Este jogo de aventura por texto foi desenvolvido e
 - **Integração de Efeitos Sonoros:** Utilização de efeitos sonoros para aprimorar a atmosfera e a imersão do jogo.
 
 **Imagens geradas por IA, para uma experiência mais interativa**
+
+## Créditos
+
+Este projeto foi desenvolvido de forma autoral, com exceção de dois elementos que foram incorporados para aprimorar a experiência do usuário:
+
+- **Música de Fundo por Rafael Krux**: Agradecemos a Rafael Krux pela sua contribuição com a composição da música de fundo, que adiciona profundidade e atmosfera ao jogo.
+
+- **Interface Gráfica do Usuário (GUI) por Ronen Ness**: Reconhecemos a contribuição de Ronen Ness na criação da GUI, que foi utilizado para melhorar a interação visual do jogo.
