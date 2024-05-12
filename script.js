@@ -2253,10 +2253,10 @@ const textNodes = [
     imgSrc1: "",
     imgSrc2: "./imgs/orc-female.png",
     textLeft: 'Encantados pela profundez de sua voz, vocês caminham em direção ao centro da sala, no entanto, à medida que se aproximam, uma sombra se materializa diante de vocês, assumindo a forma do seu maior desejo.',
-    textRight: 'Para Clargoth, a sombra se transforma em uma orc guerreira sedutora, prometendo-lhe poder e glória em troca de sua lealdade. O que vocês fazem?',
+    textRight: 'Para Clargoth, a sombra se transforma em uma guerreira orc, prometendo-lhe poder e glória em troca de sua lealdade. O que vocês fazem?',
     options: [
       {
-        text: 'Tentar seduzir a sombra para obter informações',
+        text: 'Tentar convencer a sombra para obter informações',
         rollTheDice: [14.112, 14.112, 14.113]
       }
     ]
@@ -2265,8 +2265,8 @@ const textNodes = [
     id: 14.112, // Tentar seduzir a sombra
     imgSrc1: "",
     imgSrc2: "./imgs/orc-female.png",
-    textLeft: 'Você tenta seduzir a sombra, oferecendo-lhe palavras doces e promessas de lealdade. No entanto, a sombra parece desconfiada e não é facilmente persuadida.',
-    textRight: 'Apesar de seus esforços, a sombra se mantém firme em suas exigências. Parece que vocês terão que recorrer a outras estratégias para obter o que desejam.',
+    textLeft: 'Você tenta convencer a sombra, oferecendo-lhe palavras amigáveis e promessas de cooperação. No entanto, a sombra parece desconfiada e não é facilmente persuadida.',
+    textRight: 'Apesar de seus esforços, a sombra permanece firme em suas exigências. Parece que vocês terão que recorrer a outras estratégias para obter o que desejam.',
     options: [
       {
         text: 'Lutar contra a sombra',
@@ -2317,7 +2317,7 @@ const textNodes = [
     options: [
       {
         text: 'Tentar enganar a sombra para obter informações',
-        rollTheDice: [14.121, 14.121, 14.122]
+        rollTheDice: [14.121, 14.121, 14.121]
       }
     ]
   },
@@ -2407,7 +2407,7 @@ const textNodes = [
     textRight: 'A batalha continua, mas agora vocês precisam redobrar a atenção e a coordenação para enfrentar a fera, pois ela mostrou que não será uma oponente fácil de derrotar.',
     options: [
       {
-        text: 'Continuar lutando',
+        text: 'Continuar',
         nextText: 14.163,
       }
     ]
