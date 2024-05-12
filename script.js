@@ -2317,7 +2317,7 @@ const textNodes = [
     options: [
       {
         text: 'Tentar enganar a sombra para obter informações',
-        rollTheDice: [14.121, 14.121, 14.122]
+        rollTheDice: [14.121, 14.121, 14.121]
       }
     ]
   },
@@ -2407,7 +2407,7 @@ const textNodes = [
     textRight: 'A batalha continua, mas agora vocês precisam redobrar a atenção e a coordenação para enfrentar a fera, pois ela mostrou que não será uma oponente fácil de derrotar.',
     options: [
       {
-        text: 'Continuar lutando',
+        text: 'Continuar',
         nextText: 14.163,
       }
     ]
